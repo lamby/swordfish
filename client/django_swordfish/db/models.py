@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils import simplejson
 from django.core.exceptions import ImproperlyConfigured
 
-from utils import SwordfishError
+from django_swordfish.utils import SwordfishError
 
 REPR_OUTPUT_SIZE = 20
 
