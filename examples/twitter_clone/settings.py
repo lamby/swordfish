@@ -73,10 +73,19 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
     'example',
     'django_swordfish',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.debug',
+)
+
+INTERNAL_IPS = (
+    '127.0.0.1',
+)
 
 SWORDFISH_SERVER="127.0.0.1:2929"
 import sys

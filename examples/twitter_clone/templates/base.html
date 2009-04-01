@@ -35,4 +35,15 @@
   {% block content %}{% endblock %}
 </div>
 
+<h1>SQL queries</h1>
+
+<table>
+{% for query in sql_queries %}
+<tr>
+ <td>{{ query.time }}</td>
+ <td>{{ query.sql }}</td>
+</tr>
+{% endfor %}
+</table>
+
 </body></html>
