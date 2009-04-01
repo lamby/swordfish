@@ -49,8 +49,8 @@ send_reply(struct evhttp_request *request, struct evbuffer *databuf, int errorco
 		break;
 	}
 	
-	fprintf(stderr, "[%s] %s %s %d\n",
-		request->remote_host, method, request->uri, errorcode);
+	fprintf(stderr, "[%s] %d %s %s\n",
+		request->remote_host, errorcode, method, request->uri);
 #endif
 }
 
