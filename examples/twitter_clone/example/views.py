@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 
-from django_swordfish.db import Tree
+from django_swordfish.db import Tree, TreeIntersection
 
 from models import Message
 from forms import MessageForm
@@ -34,6 +34,7 @@ def user_page(request, username):
 
     return render_to_response('user.html', {
         'user': user,
+        'users': User.objects.exclude(pk=user.pk),
         'following': following,
         'followers': followers,
         'msgs': Paginator(msgs, 10).page(request.GET.get('page', 1)),
@@ -66,4 +67,21 @@ def logged_in(request, username):
         'user': user,
         'form': form,
         'msgs': Paginator(msgs, 10).page(request.GET.get('page', 1)),
+    }, context_instance=RequestContext(request))
+
+def intersection(request):
+    a = get_object_or_404(User, username=request.GET.get('a', ''))
+    b = get_object_or_404(User, username=request.GET.get('b', ''))
+
+    # MySQL intersection (double-JOIN)
+    users = User.objects.filter(followers__src=a) & \
+        User.objects.filter(followers__src=b)
+
+    # Alternatively, use Swordfish
+    users = TreeIntersection('followed-by-%s' % a, 'followed-by-%s' % b)
+
+    return render_to_response('intersection.html', {
+        'a': a,
+        'b': b,
+        'users': Paginator(users, 10).page(request.GET.get('page', 1)),
     }, context_instance=RequestContext(request))
