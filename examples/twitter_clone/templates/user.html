@@ -16,7 +16,7 @@
   {% include "pagination.html" %}
 {% endwith %}
 
-<p>Following {{ followers.count }}:
+<p>Following {{ following.count }}:
 {% for u in following %}
   <a href="{% url user-page u %}">{{ u }}</a>
 {% endfor %}
