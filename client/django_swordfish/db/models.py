@@ -164,6 +164,10 @@ class SwordfishQuerySet(object):
         except ValueError:
             raise SwordfishError('Error decoding JSON')
 
+    def invalidate_cache(self):
+        self.count_cache = None
+        self.result_cache = None
+
 class Tree(SwordfishQuerySet):
     def __init__(self, tree):
         super(Tree, self).__init__()
