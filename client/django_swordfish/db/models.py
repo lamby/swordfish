@@ -152,7 +152,11 @@ class SwordfishQuerySet(object):
                 'You must set SWORDFISH_SERVER in settings.py'
             )
 
-        conn.request(method, path)
+        headers = {}
+        if data is not None:
+            headers['Content-Length'] = len(data)
+
+        conn.request(method, path, data, headers)
         res = conn.getresponse()
 
         try:
