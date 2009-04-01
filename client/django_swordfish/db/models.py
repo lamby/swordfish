@@ -179,6 +179,18 @@ class Tree(SwordfishQuerySet):
     def get_count_uri(self):
         return '/trees/%s/count/' % quote(self.tree)
 
+    def set(self, key, value):
+        assert self.low_mark == 0 and self.high_mark is None and \
+            self._values is None and self.model is None, \
+                "Must call .set() or .delete() on base Tree()"
+
+        self.make_call(
+            '/trees/%s/item/%s/' % (quote(self.tree), quote(str(key))),
+            'POST',
+            str(value),
+        )
+        self.invalidate_cache()
+
 class TreeIntersection(SwordfishQuerySet):
     def __init__(self, left_tree, right_tree):
         super(TreeIntersection, self).__init__()
