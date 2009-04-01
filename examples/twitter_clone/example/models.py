@@ -17,6 +17,7 @@ class Following(models.Model):
 
 class Message(models.Model):
     user = models.ForeignKey(User, related_name='messages')
+    username = models.CharField(max_length=15)
     msg = models.CharField(max_length=140)
     date = models.DateTimeField(default=datetime.datetime.now)
 
@@ -24,6 +25,8 @@ class Message(models.Model):
         ordering = ('-date',)
 
     def save(self, *args, **kwargs):
+        self.username = self.user.username
+
         super(Message, self).save(*args, **kwargs)
 
         key = '%0.10d-%d' % (
