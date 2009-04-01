@@ -23,8 +23,8 @@ def user_page(request, username):
     followers = User.objects.filter(followers__src=user)
 
     # Alternatively, use .as_model() to get the User objects out
-    following = Tree('followed-by-%s' % user).keys().as_model(User)
-    followers = Tree('follower-of-%s' % user).keys().as_model(User)
+    following = Tree('followed-by-%s' % user).values().as_model(User)
+    followers = Tree('follower-of-%s' % user).values().as_model(User)
     """
 
     # Or (better still) as our URLs are deterministic, just get the keys out
