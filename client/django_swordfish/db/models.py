@@ -196,7 +196,12 @@ class Tree(SwordfishQuerySet):
         if key is not None:
             return self.set(key, '')
 
-        assert False, "Delete entire tree not implemented yet"
+        # Delete entire tree not implemented yet
+        self.make_call(
+            '/trees/%s/delete/' % quote(self.tree),
+            'POST',
+            '',
+        )
 
 class TreeIntersection(SwordfishQuerySet):
     def __init__(self, left_tree, right_tree):
