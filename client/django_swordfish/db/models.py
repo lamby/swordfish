@@ -191,6 +191,13 @@ class Tree(SwordfishQuerySet):
         )
         self.invalidate_cache()
 
+    def delete(self, key=None):
+        # Just delete specified key
+        if key is not None:
+            return self.set(key, '')
+
+        assert False, "Delete entire tree not implemented yet"
+
 class TreeIntersection(SwordfishQuerySet):
     def __init__(self, left_tree, right_tree):
         super(TreeIntersection, self).__init__()
