@@ -1,7 +1,7 @@
 import httplib
 
 from copy import deepcopy
-from urllib import urlencode
+from urllib import quote, urlencode
 
 from django.conf import settings
 from django.utils import simplejson
@@ -174,10 +174,10 @@ class Tree(SwordfishQuerySet):
         self.tree = tree
 
     def get_uri(self):
-        return '/trees/%s/' % self.tree
+        return '/trees/%s/' % quote(self.tree)
 
     def get_count_uri(self):
-        return '/trees/%s/count/' % self.tree
+        return '/trees/%s/count/' % quote(self.tree)
 
 class TreeIntersection(SwordfishQuerySet):
     def __init__(self, left_tree, right_tree):
@@ -186,8 +186,9 @@ class TreeIntersection(SwordfishQuerySet):
         self.right_tree = right_tree
 
     def get_uri(self):
-        return '/trees/%s/intersection/%s/' % (self.left_tree, self.right_tree)
+        return '/trees/%s/intersection/%s/' % \
+            (quote(self.left_tree), quote(self.right_tree))
 
     def get_count_uri(self):
         return '/trees/%s/intersection/%s/count/' % \
-            (self.left_tree, self.right_tree)
+            (quote(self.left_tree), quote(self.right_tree))
