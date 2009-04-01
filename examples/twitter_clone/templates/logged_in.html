@@ -11,16 +11,18 @@
 <input type="submit" value="Submit"/>
 </form>
 
-{% include "pagination.html" %}
+{% with msgs as pagination %}
+  {% include "pagination.html" %}
 
-{% for msg in msgs.object_list %}
-  <p class="msg">
-    <a class="by" href="{% url user-page msg.username %}">{{ msg.username }}</a>
-    <span class="text">{{ msg.msg }}</span> <span class="date">{{ msg.date|timesince }} ago</span>
-  </p>
-{% endfor %}
+  {% for msg in msgs.object_list %}
+    <p class="msg">
+      <a class="by" href="{% url user-page msg.username %}">{{ msg.username }}</a>
+      <span class="text">{{ msg.msg }}</span> <span class="date">{{ msg.date|timesince }} ago</span>
+    </p>
+  {% endfor %}
 
-{% include "pagination.html" %}
+  {% include "pagination.html" %}
+{% endwith %}
 
 <p><a href="{% url user-page user %}">View {{ user }}'s main page</a></p>
 

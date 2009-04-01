@@ -1,10 +1,10 @@
 <p id="pagination">
-  Showing {{ msgs.start_index }} &rarr; {{ msgs.end_index }} of {{ msgs.paginator.count }} message(s).
-  Page {{ msgs.number }} of {{ msgs.paginator.num_pages }}.
-  {% if msgs.has_previous %}
-    <a href="?page={{ msgs.previous_page_number }}">&larr; Prev</a>
+  Showing {{ pagination.start_index }} &rarr; {{ pagination.end_index }} of {{ pagination.paginator.count }} message(s).
+  Page {{ pagination.number }} of {{ pagination.paginator.num_pages }}.
+  {% if pagination.has_previous %}
+    <a href="?page={{ pagination.previous_page_number }}">&larr; Prev</a>
   {% endif %}
-  {% if msgs.has_next %}
-   <a href="?page={{ msgs.next_page_number }}">Next &rarr;</a>
+  {% if pagination.has_next %}
+   <a href="?page={{ pagination.next_page_number }}">Next &rarr;</a>
   {% endif %}
 </p>

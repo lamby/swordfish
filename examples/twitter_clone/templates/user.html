@@ -4,15 +4,17 @@
 
 <h1>{{ user }}'s messages</h1>
 
-{% include "pagination.html" %}
+{% with msgs as pagination %}
+  {% include "pagination.html" %}
 
-{% for msg in msgs.object_list %}
-  <p class="msg">
-    <span class="text">{{ msg.msg }}</span> <span class="date">{{ msg.date|timesince }} ago</span>
-  </p>
-{% endfor %}
+  {% for msg in msgs.object_list %}
+    <p class="msg">
+      <span class="text">{{ msg.msg }}</span> <span class="date">{{ msg.date|timesince }} ago</span>
+    </p>
+  {% endfor %}
 
-{% include "pagination.html" %}
+  {% include "pagination.html" %}
+{% endwith %}
 
 <p>Following {{ followers.count }}:
 {% for u in following %}
