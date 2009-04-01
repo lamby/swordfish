@@ -269,7 +269,6 @@ handler_tree_set_item(struct evhttp_request *request, char *tree_key, char *valu
 {
 	int size;
 	int ecode;
-	int result_count = 0;
 
 	int rawtree_size;
 	void *rawtree;
@@ -338,7 +337,6 @@ void
 handler_tree_get_item(struct evhttp_request *request, char *tree_key, char *value_key)
 {
 	int ecode;
-	int result_count = 0;
 
 	int rawtree_size;
 	char *rawtree;
@@ -523,8 +521,6 @@ get_int_header(struct evkeyvalq *querystr, const char *header, int def)
 void
 request_handler(struct evhttp_request *request, void *arg)
 {
-	int just;
-
 	char *uri;
 	char *saveptr;	
 
