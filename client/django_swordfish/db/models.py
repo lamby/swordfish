@@ -202,6 +202,7 @@ class Tree(SwordfishQuerySet):
             'POST',
             '',
         )
+        self.invalidate_cache()
 
 class TreeIntersection(SwordfishQuerySet):
     def __init__(self, left_tree, right_tree):
