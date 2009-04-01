@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ user }}'s logged in page</h1>
+
+<p><em>This is the page {{ user }} would see if they were logged in.</em></p>
+
+<form action="" method="post">
+{{ form }}
+<input type="submit" value="Submit"/>
+</form>
+
+{% include "pagination.html" %}
+
+{% for msg in msgs.object_list %}
+  <p class="msg">
+    <a class="by" href="{% url user-page msg.user %}">{{ msg.user }}</a>
+    <span class="text">{{ msg.msg }}</span> <span class="date">{{ msg.date|timesince }} ago</span>
+  </p>
+{% endfor %}
+
+{% include "pagination.html" %}
+
+<p><a href="{% url user-page user %}">View {{ user }}'s main page</a></p>
+
+{% endblock %}
