@@ -33,7 +33,8 @@ const char *lookup_table[] = {
 	"stats",
 	"sync",
 	"keys",
-	"values"
+	"values",
+	"delete"
 };
 
 enum {
@@ -46,6 +47,7 @@ enum {
 	RESOURCE_SYNC,
 	RESOURCE_KEYS,
 	RESOURCE_VALUES,
+	RESOURCE_DELETE,
 
 	RESOURCE_NONE,
 	RESOURCE_UNKNOWN,

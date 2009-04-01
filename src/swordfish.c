@@ -474,6 +474,28 @@ end:
 	++stats.total_cmds;
 }
 
+void
+handler_tree_delete(struct evhttp_request *request, char *key)
+{
+	struct evbuffer *databuf = evbuffer_new();
+
+	switch (request->type) {
+	case EVHTTP_REQ_POST:
+		evbuffer_add_printf(databuf,
+			(tchdbout2(db, key)) ? "true" : "false");
+		REPLY_OK(request, databuf);
+		break;
+
+	default:
+		evbuffer_add_printf(databuf,
+			"{\"err\": \"delete should be POST\"}");
+		REPLY_BADMETHOD(request, databuf);
+	}
+
+	evbuffer_free(databuf);
+	++stats.total_cmds;
+}
+
 int
 get_values_value(struct evkeyvalq *querystr)
 {
@@ -583,6 +605,11 @@ request_handler(struct evhttp_request *request, void *arg)
 				get_int_header(&querystr, "skip", 0),
 				get_int_header(&querystr, "limit", 0),
 				VALUES_ALL);
+			break;
+
+		case RESOURCE_DELETE:
+			/* delete tree `tree` */
+			handler_tree_delete(request, tree);
 			break;
 
 		case RESOURCE_INTERSECTION:
