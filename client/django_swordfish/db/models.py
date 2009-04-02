@@ -204,6 +204,29 @@ class Tree(SwordfishQuerySet):
         )
         self.invalidate_cache()
 
+    def map(self, prefix, key, value):
+        """
+
+        >>> Tree('foo').keys().maps('prefix-', 1, 2)
+
+        is equivalent to:
+
+        >>> for val in Tree('foo').keys():
+                Tree(%s%s' % (prefix, val)).set(key, value)
+        """
+        assert self._values is not None, \
+            "map() must be called after one of keys() or values()"
+
+        self.make_call(
+            '/trees/%s/map/%s/%s' % (
+                quote(self.tree),
+                quote(prefix),
+                quote(key),
+            ),
+            'POST',
+            str(value),
+        )
+
 class TreeIntersection(SwordfishQuerySet):
     def __init__(self, left_tree, right_tree):
         super(TreeIntersection, self).__init__()
