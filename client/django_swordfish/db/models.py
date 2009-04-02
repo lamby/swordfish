@@ -218,10 +218,11 @@ class Tree(SwordfishQuerySet):
             "map() must be called after one of keys() or values()"
 
         self.make_call(
-            '/trees/%s/map/%s/%s' % (
+            '/trees/%s/map/%s/%s?values=%s' % (
                 quote(self.tree),
                 quote(prefix),
                 quote(key),
+                self._values,
             ),
             'POST',
             str(value),
