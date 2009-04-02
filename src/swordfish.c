@@ -492,6 +492,133 @@ handler_tree_delete(struct evhttp_request *request, char *key)
 		REPLY_BADMETHOD(request, databuf);
 	}
 
+
+	evbuffer_free(databuf);
+	++stats.total_cmds;
+}
+
+
+void
+handler_tree_map(struct evhttp_request *request, char *src_key, char *prefix, char *value_key, int map_from)
+{
+	int size;
+	int ecode;
+	int post_size;
+
+	char *rawtree;
+	int rawtree_size;
+
+	const char *elem;
+
+	char *dst_key;
+
+	struct evbuffer *databuf = evbuffer_new();
+
+	TCTREE *src_tree;
+	TCTREE *dst_tree;
+
+	if (request->type != EVHTTP_REQ_POST) {
+		evbuffer_add_printf(databuf,
+			"{\"err\": \"map should be POST\"}");
+		REPLY_BADMETHOD(request, databuf);
+		goto end;
+	}
+
+	if (request->ntoread) {
+		evbuffer_add_printf(databuf,
+			"{\"err\": \"Not enough POST data\"}");
+		REPLY_BADMETHOD(request, databuf);
+		goto end;
+	}
+
+	post_size = EVBUFFER_LENGTH(request->input_buffer);
+	if (!post_size) {
+		evbuffer_add_printf(databuf,
+			"{\"err\": \"Size of POST data must be > 0\"}");
+		REPLY_BADMETHOD(request, databuf);
+		goto end;
+	}
+
+	rawtree = tchdbget(db, src_key, strlen(src_key), &rawtree_size);
+
+	if (!rawtree) {
+		ecode = tchdbecode(db);
+
+		if (ecode != TCENOREC) {
+			evbuffer_add_printf(databuf,
+				"{\"msg\": \"%s\"}", tchdberrmsg(ecode));
+			REPLY_INTERR(request, databuf);
+			goto end;
+		}
+
+		evbuffer_add_printf(databuf, "true");
+		REPLY_OK(request, databuf);
+		
+		goto end;
+	}
+	
+	src_tree = tctreeload(rawtree, rawtree_size, SWORDFISH_KEY_CMP, NULL);
+	free(rawtree);
+
+	tctreeiterinit(src_tree);
+
+	while (elem = tctreeiternext2(src_tree))
+	{
+		dst_key = (char*)malloc(strlen(elem) + strlen(prefix) + 1);
+		sprintf(dst_key, "%s%s", prefix, elem);
+
+		rawtree = tchdbget(db, dst_key, strlen(dst_key), &rawtree_size);
+
+		if (rawtree) {
+			dst_tree = tctreeload(rawtree, rawtree_size, SWORDFISH_KEY_CMP, NULL);
+			free(rawtree);
+		} else {
+			ecode = tchdbecode(db);
+
+			if (ecode != TCENOREC) {
+				free(dst_key);
+				tctreedel(src_tree);
+				tctreedel(dst_tree);
+
+				evbuffer_add_printf(databuf,
+					"{\"msg\": \"%s\"}", tchdberrmsg(ecode));
+				REPLY_INTERR(request, databuf);
+				goto end;
+			}
+
+			dst_tree = tctreenew2(SWORDFISH_KEY_CMP, NULL);
+		}
+
+		tctreeput(dst_tree, value_key, strlen(value_key),
+			EVBUFFER_DATA(request->input_buffer), post_size);
+
+		rawtree = tctreedump(dst_tree, &size);
+
+		if (!tchdbput(db, dst_key, strlen(dst_key), rawtree, size)) {
+			ecode = tchdbecode(db);
+
+			free(rawtree);
+			free(dst_key);
+			tctreedel(src_tree);
+			tctreedel(dst_tree);
+
+			evbuffer_add_printf(databuf,
+				"{\"msg\": \"%s\"}", tchdberrmsg(ecode));
+			REPLY_INTERR(request, databuf);
+			goto end;
+		}
+
+		free(dst_key);
+		free(rawtree);
+		tctreedel(dst_tree);
+	}
+
+	tctreedel(src_tree);
+
+	evbuffer_add_printf(databuf, "true");
+	REPLY_OK(request, databuf);
+
+end:
 	evbuffer_free(databuf);
 	++stats.total_cmds;
 }
@@ -548,6 +675,7 @@ request_handler(struct evhttp_request *request, void *arg)
 
 	char *tree;
 	char *arg_1;
+	char *arg_2;
 
 	struct evkeyvalq querystr;
 	struct evbuffer *databuf = evbuffer_new();
@@ -635,10 +763,15 @@ request_handler(struct evhttp_request *request, void *arg)
 			break;
 
 		case RESOURCE_MAP:
-			/* map `tree` onto `arg_1` */
+			/* map contents of `tree` using prefix `arg_1` */
 			if ((arg_1 = strtok_r(NULL, "/", &saveptr)) == NULL)
 				goto notfound;
-			REPLY_OK(request, databuf);
+
+			if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+				goto notfound;
+
+			handler_tree_map(request, tree, arg_1, arg_2, get_values_value(&querystr));
+			
 			break;
 
 		default:
