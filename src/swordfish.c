@@ -509,6 +509,7 @@ handler_tree_map(struct evhttp_request *request, char *src_key, char *prefix, ch
 	int rawtree_size;
 
 	const char *elem;
+	const char *elem_value;
 
 	char *dst_key;
 
@@ -564,8 +565,13 @@ handler_tree_map(struct evhttp_request *request, char *src_key, char *prefix, ch
 
 	while (elem = tctreeiternext2(src_tree))
 	{
-		dst_key = (char*)malloc(strlen(elem) + strlen(prefix) + 1);
-		sprintf(dst_key, "%s%s", prefix, elem);
+		/* Determine value to be appended to the prefix to determine
+		   the target tree. */
+		elem_value = (map_from == VALUES_VALUES) ?
+			tctreeget2(src_tree, elem) : elem;
+
+		dst_key = (char*)malloc(strlen(prefix) + strlen(elem_value) + 1);
+		sprintf(dst_key, "%s%s", prefix, elem_value);
 
 		rawtree = tchdbget(db, dst_key, strlen(dst_key), &rawtree_size);
 
