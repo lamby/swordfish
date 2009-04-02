@@ -34,6 +34,12 @@ class Message(models.Model):
             self.pk,
         )
 
+        # Add the message to the user's message tree.
         Tree('messages-for-%s' % self.user).set(key, self.pk)
-        for username in Tree('follower-of-%s' % self.user).keys():
-            Tree('messages-for-%s' % username).set(key, self.pk)
+
+        # Use the follower-of- tree for this user to add the message their
+        # followers' trees.
+        #
+        # This step could be done asynchronously if required - the above call
+        # could still be made sychronously to maintain the illusion.
+        Tree('follower-of-%s' % self.user).keys().map('messages-for-', key, self.pk)
