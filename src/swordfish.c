@@ -158,7 +158,7 @@ end:
 }
 
 void
-handler_tree_intersection(struct evhttp_request *request, char *left_key, char *right_key, int count, int skip, int limit)
+handler_tree_intersection(struct evhttp_request *request, char *left_key, char *right_key, int result, int skip, int limit)
 {
 	int size;
 	int cmp_val;
@@ -187,7 +187,11 @@ handler_tree_intersection(struct evhttp_request *request, char *left_key, char *
 	right = tctreeload(value, size, SWORDFISH_KEY_CMP, NULL);
 	free(value);
 
-	evbuffer_add_printf(databuf, (count) ? "{\"count\": " : "{\"items\": [");
+	if (result == RESULT_COUNT_ONLY) {
+		evbuffer_add_printf(databuf, "{\"count\": ");
+	} else {
+		evbuffer_add_printf(databuf, "{\"items\": [");
+	}
 
 	tctreeiterinit(left);
 	tctreeiterinit(right);
@@ -212,7 +216,7 @@ handler_tree_intersection(struct evhttp_request *request, char *left_key, char *
 		case 0:
 			/* left == right; Element intersects */
 			if (skip == 0) {
-				if (!count) {
+				if (result == RESULT_ITEMS) {
 					if (result_count)
 						evbuffer_add_printf(databuf, ", ");
 					append_json_value(databuf, left_val);
@@ -241,7 +245,7 @@ handler_tree_intersection(struct evhttp_request *request, char *left_key, char *
 
 	}
 
-	if (count) {
+	if (result == RESULT_COUNT_ONLY) {
 		evbuffer_add_printf(databuf, "%d}", result_count);
 	} else {
 		evbuffer_add_printf(databuf, "]}");
@@ -252,8 +256,12 @@ handler_tree_intersection(struct evhttp_request *request, char *left_key, char *
 	goto end;
 
 no_items:
-	evbuffer_add_printf(databuf,
-		(count) ? "{\"count\": 0}" : "{\"items\": []}");
+	if (result == RESULT_COUNT_ONLY) {
+		evbuffer_add_printf(databuf, "{\"count\": 0}");
+	} else {
+		evbuffer_add_printf(databuf, "{\"items\": []}");
+	}
+
 	REPLY_OK(request, databuf);
 
 end:
@@ -388,7 +396,7 @@ end:
 }
 
 void
-handler_tree_get(struct evhttp_request *request, char *key, int count, int skip, int limit, int just)
+handler_tree_get(struct evhttp_request *request, char *key, int result, int skip, int limit, int just)
 {
 	int ecode;
 	int result_count = 0;
@@ -413,8 +421,11 @@ handler_tree_get(struct evhttp_request *request, char *key, int count, int skip,
 			goto end;
 		}
 
-		evbuffer_add_printf(databuf,
-			(count) ? "{\"count\": 0}" : "{\"items\": []}");
+		if (result == RESULT_COUNT_ONLY) {
+			evbuffer_add_printf(databuf, "{\"count\": 0}");
+		} else {
+			evbuffer_add_printf(databuf, "{\"items\": []}");
+		}
 
 		REPLY_OK(request, databuf);
 		
@@ -424,7 +435,7 @@ handler_tree_get(struct evhttp_request *request, char *key, int count, int skip,
 	tree = tctreeload(rawtree, rawtree_size, SWORDFISH_KEY_CMP, NULL);
 	free(rawtree);
 
-	if (count) {
+	if (result == RESULT_COUNT_ONLY) {
 		evbuffer_add_printf(databuf,
 			"{\"count\": %llu}", (long long)tctreernum(tree));
 		REPLY_OK(request, databuf);
@@ -715,7 +726,7 @@ request_handler(struct evhttp_request *request, void *arg)
 		switch (lookup(strtok_r(NULL, "/", &saveptr))) {
 
 		case RESOURCE_NONE:
-			handler_tree_get(request, tree, 0,
+			handler_tree_get(request, tree, RESULT_ITEMS,
 				get_int_header(&querystr, "skip", 0),
 				get_int_header(&querystr, "limit", 0),
 				get_values_value(&querystr));
@@ -735,7 +746,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			break;
 
 		case RESOURCE_COUNT:
-			handler_tree_get(request, tree, 1,
+			handler_tree_get(request, tree, RESULT_COUNT_ONLY,
 				get_int_header(&querystr, "skip", 0),
 				get_int_header(&querystr, "limit", 0),
 				VALUES_ALL);
@@ -753,13 +764,14 @@ request_handler(struct evhttp_request *request, void *arg)
 
 			switch (lookup(strtok_r(NULL, "/", &saveptr))) {
 			case RESOURCE_NONE:
-				handler_tree_intersection(request, tree, arg_1, 0,
+				handler_tree_intersection(request, tree, arg_1, RESULT_ITEMS,
 					get_int_header(&querystr, "skip", 0),
 					get_int_header(&querystr, "limit", 0));
 				break;
 
 			case RESOURCE_COUNT:
-				handler_tree_intersection(request, tree, arg_1, 1, 0, -1);
+				handler_tree_intersection(request, tree, arg_1, RESULT_COUNT_ONLY,
+					0, -1);
 				break;
 				
 			default:
