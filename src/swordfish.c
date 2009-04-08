@@ -563,7 +563,7 @@ handler_tree_map(struct evhttp_request *request, char *src_key, char *prefix, ch
 
 	tctreeiterinit(src_tree);
 
-	while (elem = tctreeiternext2(src_tree))
+	while ((elem = tctreeiternext2(src_tree)))
 	{
 		/* Determine value to be appended to the prefix to determine
 		   the target tree. */
