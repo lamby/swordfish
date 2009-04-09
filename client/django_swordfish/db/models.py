@@ -236,12 +236,12 @@ class Tree(SwordfishQuerySet):
 
     def map(self, prefix, key, value):
         """
-        >>> Tree('foo').keys().maps('prefix-', 1, 2)
+        >>> Tree('foo').keys().maps('prefix-', key, value)
 
         is equivalent to:
 
-        >>> for val in Tree('foo').keys():
-                Tree(%s%s' % (prefix, val)).set(key, value)
+        >>> for val in Tree('foo-%d' % ).keys():
+                Tree('%s%s' % (prefix, val)).set(key, value)
         """
         assert self._values is not None, \
             "map() must be called after one of keys() or values()"
