@@ -45,6 +45,7 @@ enum {
 const char *lookup_table[] = {
 	"trees",
 	"intersection",
+	"difference",
 	"count",
 	"item",
 	"map",
@@ -58,6 +59,7 @@ const char *lookup_table[] = {
 enum {
 	RESOURCE_TREES,
 	RESOURCE_INTERSECTION,
+	RESOURCE_DIFFERENCE,
 	RESOURCE_COUNT,
 	RESOURCE_ITEM,
 	RESOURCE_MAP,
