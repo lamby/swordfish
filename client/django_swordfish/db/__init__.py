@@ -28,4 +28,4 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-from models import Tree, TreeIntersection
+from models import Tree, TreeIntersection, TreeDifference

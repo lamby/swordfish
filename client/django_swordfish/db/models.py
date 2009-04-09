@@ -273,3 +273,6 @@ class TreeCommand(SwordfishQuerySet):
 
 class TreeIntersection(TreeCommand):
     COMMAND = 'intersection'
+
+class TreeDifference(TreeCommand):
+    COMMAND = 'difference'
