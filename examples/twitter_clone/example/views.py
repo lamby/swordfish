@@ -35,7 +35,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 
-from django_swordfish.db import Tree, TreeIntersection
+from django_swordfish.db import Tree, TreeIntersection, TreeDifference
 
 from models import Message
 from forms import MessageForm
@@ -111,6 +111,24 @@ def intersection(request):
     users = TreeIntersection('followed-by-%s' % a, 'followed-by-%s' % b)
 
     return render_to_response('intersection.html', {
+        'a': a,
+        'b': b,
+        'users': Paginator(users, 10).page(request.GET.get('page', 1)),
+    }, context_instance=RequestContext(request))
+
+def difference(request):
+    a = get_object_or_404(User, username=request.GET.get('a', ''))
+    b = get_object_or_404(User, username=request.GET.get('b', ''))
+
+    # MySQL/Python difference (memory-bound, requires in-Python sorting)
+    users = list(set(User.objects.filter(followers__src=a)) - \
+        set(User.objects.filter(followers__src=b)))
+    users.sort()
+
+    # Alternatively, use Swordfish
+    users = TreeDifference('followed-by-%s' % a, 'followed-by-%s' % b)
+
+    return render_to_response('difference.html', {
         'a': a,
         'b': b,
         'users': Paginator(users, 10).page(request.GET.get('page', 1)),

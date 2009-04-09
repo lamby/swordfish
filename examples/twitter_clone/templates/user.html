@@ -40,6 +40,18 @@
 </p>
 </form>
 
+<form action="{% url difference %}" method="get">
+<p>View the difference between {{ user }}'s following and
+  <input type="hidden" name="a" value="{{ user }}"/>
+  <select name="b">
+    {% for user in users %}
+      <option>{{ user }}</option>
+    {% endfor %}
+  </select>
+  <input type="submit" value="Go"/>
+</p>
+</form>
+
 <p><a href="{% url logged-in user %}">View {{ user }}'s logged in page</a></p>
 
 {% endblock %}

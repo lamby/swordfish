@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}All users{% endblock %}
+
+{% block content %}
+
+<h1>Users that <a href="{% url user-page a %}">{{ a }}</a> is following that <a href="{% url user-page b %}">{{ b }}</a> is not following</h1>
+
+{% with users as pagination %}
+  {% include "pagination.html" %}
+{% endwith %}
+
+<ul>
+{% for user in users.object_list %}
+  <li><a href="{% url user-page user %}">{{ user }}</a></li>
+{% endfor %}
+</ul>
+
+{% with users as pagination %}
+  {% include "pagination.html" %}
+{% endwith %}
+
+{% endblock %}
