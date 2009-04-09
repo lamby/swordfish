@@ -187,10 +187,10 @@ class SwordfishQuerySet(object):
             headers['Content-Length'] = len(data)
 
         conn.request(method, path, data, headers)
-        res = conn.getresponse()
+        val = conn.getresponse().read()
 
         try:
-            return simplejson.loads(res.read())
+            return simplejson.loads(val)
         except ValueError:
             raise SwordfishError('Error decoding JSON')
 
