@@ -257,16 +257,19 @@ class Tree(SwordfishQuerySet):
             str(value),
         )
 
-class TreeIntersection(SwordfishQuerySet):
+class TreeCommand(SwordfishQuerySet):
     def __init__(self, left_tree, right_tree):
-        super(TreeIntersection, self).__init__()
+        super(TreeCommand, self).__init__()
         self.left_tree = left_tree
         self.right_tree = right_tree
 
     def get_uri(self):
-        return '/trees/%s/intersection/%s/' % \
-            (quote(self.left_tree), quote(self.right_tree))
+        return '/trees/%s/%s/%s/' % \
+            (quote(self.left_tree), self.COMMAND, quote(self.right_tree))
 
     def get_count_uri(self):
-        return '/trees/%s/intersection/%s/count/' % \
-            (quote(self.left_tree), quote(self.right_tree))
+        return '/trees/%s/%s/%s/count/' % \
+            (quote(self.left_tree), self.COMMAND, quote(self.right_tree))
+
+class TreeIntersection(TreeCommand):
+    COMMAND = 'intersection'
