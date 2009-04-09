@@ -542,11 +542,12 @@ handler_tree_set_item(struct evhttp_request *request, char *tree_key, char *valu
 
 	size = EVBUFFER_LENGTH(request->input_buffer);
 
-	if (size)
+	if (size) {
 		tctreeput(tree, value_key, strlen(value_key),
 			EVBUFFER_DATA(request->input_buffer), size);
-	else
+	} else {
 		tctreeout2(tree, value_key);
+	}
 
 	rawtree = tctreedump(tree, &size);
 	if (!tchdbput(db, tree_key, strlen(tree_key), rawtree, size)) {
