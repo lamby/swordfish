@@ -176,7 +176,7 @@ end:
 }
 
 void
-handler_tree_intersection(struct evhttp_request *request, char *left_key, char *right_key, int result, int skip, int limit)
+handler_tree_intersection(struct evhttp_request *request, char *left_key, char *right_key, int result, int values, int skip, int limit)
 {
 	int size;
 	int cmp_val;
@@ -235,9 +235,25 @@ handler_tree_intersection(struct evhttp_request *request, char *left_key, char *
 			/* left == right; Element intersects */
 			if (skip == 0) {
 				if (result == RESULT_ITEMS) {
-					if (result_count)
-						evbuffer_add_printf(databuf, ", ");
-					append_json_value(databuf, left_val);
+					switch (values) {
+					case VALUES_KEYS:
+						if (result_count)
+							evbuffer_add_printf(databuf, ",");
+						append_json_value(databuf, left_val);
+						break;
+					case VALUES_VALUES:
+						if (result_count)
+							evbuffer_add_printf(databuf, ",");
+						append_json_value(databuf, tctreeget2(left, left_val));
+						break;
+					case VALUES_ALL:
+						evbuffer_add_printf(databuf,
+							(result_count == 0) ? "[" : ",[");
+						append_json_value(databuf, left_val);
+						evbuffer_add_printf(databuf, ",");
+						append_json_value(databuf, tctreeget2(left, left_val));
+						evbuffer_add_printf(databuf, "]");
+					}
 				}
 
 				++result_count;
@@ -999,13 +1015,14 @@ request_handler(struct evhttp_request *request, void *arg)
 			switch (lookup(strtok_r(NULL, "/", &saveptr))) {
 			case RESOURCE_NONE:
 				handler_tree_intersection(request, tree, arg_1, RESULT_ITEMS,
+					get_values_value(&querystr),
 					get_int_header(&querystr, "skip", 0),
 					get_int_header(&querystr, "limit", 0));
 				break;
 
 			case RESOURCE_COUNT:
 				handler_tree_intersection(request, tree, arg_1, RESULT_COUNT_ONLY,
-					0, -1);
+					VALUES_KEYS, 0, -1);
 				break;
 				
 			default:
