@@ -50,7 +50,7 @@ def index(request):
 def user_page(request, username):
     user = get_object_or_404(User, username=username)
 
-    # Use MySQL to get the User objects out via JOINs
+    # Use SQL to get the User objects out via JOINs
     following = User.objects.filter(following__dst=user)
     followers = User.objects.filter(followers__src=user)
 
@@ -87,7 +87,7 @@ def logged_in(request, username):
     else:
         form = MessageForm()
 
-    # Use MySQL to get the Message objects out via JOIN and DISTINCT
+    # Use SQL to get the Message objects out via JOIN and DISTINCT
     msgs = Message.objects.filter(
         Q(user=user) | Q(user__following__dst=user)
     ).distinct()
@@ -105,7 +105,7 @@ def intersection(request):
     a = get_object_or_404(User, username=request.GET.get('a', ''))
     b = get_object_or_404(User, username=request.GET.get('b', ''))
 
-    # MySQL intersection (double-JOIN)
+    # SQL intersection (double-JOIN)
     users = User.objects.filter(followers__src=a) & \
         User.objects.filter(followers__src=b)
 
@@ -122,7 +122,7 @@ def difference(request):
     a = get_object_or_404(User, username=request.GET.get('a', ''))
     b = get_object_or_404(User, username=request.GET.get('b', ''))
 
-    # MySQL/Python difference (memory-bound, requires in-Python sorting)
+    # SQL/Python difference (memory-bound, requires in-Python sorting)
     users = list(set(User.objects.filter(followers__src=a)) - \
         set(User.objects.filter(followers__src=b)))
     users.sort(key=attrgetter('pk'))
