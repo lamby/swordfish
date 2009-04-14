@@ -37,9 +37,10 @@ struct config {
 #define SWORDFISH_KEY_CMP tccmplexical
 
 enum {
-	VALUES_ALL,
-	VALUES_KEYS,
-	VALUES_VALUES,
+	RESULT_COUNT,
+	RESULT_ALL,
+	RESULT_KEYS,
+	RESULT_VALUES,
 };
 
 const char *lookup_table[] = {
@@ -72,9 +73,4 @@ enum {
 	RESOURCE_NONE,
 	RESOURCE_UNKNOWN,
 	RESOURCE_ALL
-};
-
-enum {
-	RESULT_COUNT_ONLY,
-	RESULT_ITEMS
 };
