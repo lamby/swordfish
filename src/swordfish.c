@@ -983,7 +983,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			handler_tree_get(request, tree, RESULT_COUNT_ONLY,
 				get_int_header(&querystr, "skip", 0),
 				get_int_header(&querystr, "limit", 0),
-				VALUES_ALL);
+				VALUES_KEYS);
 			break;
 
 		case RESOURCE_DELETE:
