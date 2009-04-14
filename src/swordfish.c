@@ -191,25 +191,25 @@ handler_tree_intersection(struct evhttp_request *request, char *left_key, char *
 
 	struct evbuffer *databuf = evbuffer_new();
 
+	if (result == RESULT_COUNT) {
+		evbuffer_add_printf(databuf, "{\"count\": ");
+	} else {
+		evbuffer_add_printf(databuf, "{\"items\": [");
+	}
+
 	value = tchdbget(db, left_key, strlen(left_key), &size);
 	if (!value) {
-		goto no_items;
+		goto end;
 	}
 	left = tctreeload(value, size, SWORDFISH_KEY_CMP, NULL);
 	free(value);
 
 	value = tchdbget(db, right_key, strlen(right_key), &size);
 	if (!value) {
-		goto no_items;
+		goto end;
 	}
 	right = tctreeload(value, size, SWORDFISH_KEY_CMP, NULL);
 	free(value);
-
-	if (result == RESULT_COUNT) {
-		evbuffer_add_printf(databuf, "{\"count\": ");
-	} else {
-		evbuffer_add_printf(databuf, "{\"items\": [");
-	}
 
 	tctreeiterinit(left);
 	tctreeiterinit(right);
@@ -277,6 +277,7 @@ handler_tree_intersection(struct evhttp_request *request, char *left_key, char *
 
 	}
 
+end:
 	if (result == RESULT_COUNT) {
 		evbuffer_add_printf(databuf, "%d}", result_count);
 	} else {
@@ -285,18 +286,6 @@ handler_tree_intersection(struct evhttp_request *request, char *left_key, char *
 
 	REPLY_OK(request, databuf);
 
-	goto end;
-
-no_items:
-	if (result == RESULT_COUNT) {
-		evbuffer_add_printf(databuf, "{\"count\": 0}");
-	} else {
-		evbuffer_add_printf(databuf, "{\"items\": []}");
-	}
-
-	REPLY_OK(request, databuf);
-
-end:
 	if (left) tctreedel(left);
 	if (right) tctreedel(right);
 
