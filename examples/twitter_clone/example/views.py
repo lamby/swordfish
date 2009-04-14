@@ -122,10 +122,10 @@ def difference(request):
     a = get_object_or_404(User, username=request.GET.get('a', ''))
     b = get_object_or_404(User, username=request.GET.get('b', ''))
 
-    # SQL/Python difference (memory-bound, requires in-Python sorting)
-    users = list(set(User.objects.filter(followers__src=a)) - \
-        set(User.objects.filter(followers__src=b)))
-    users.sort(key=attrgetter('pk'))
+    ## SQL/Python difference (memory-bound, requires in-Python sorting)
+    # users = list(set(User.objects.filter(followers__src=a)) - \
+    #    set(User.objects.filter(followers__src=b)))
+    #users.sort(key=attrgetter('pk'))
 
     # Alternatively, use Swordfish
     users = TreeDifference('followed-by-%s' % a, 'followed-by-%s' % b).keys()
