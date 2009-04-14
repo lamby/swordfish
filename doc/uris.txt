@@ -1,0 +1,19 @@
+
+URI						METHOD		INPUT		OUTPUT
+=====================================================================================================
+/stats						GET				server statistics
+/sync						POST				sync server with disk
+
+/trees/${TREE}/					GET				Items in tree
+/trees/${TREE}/count/				GET				Items in tree
+
+/trees/${TREE}/item/${KEY}			GET				Value at key
+/trees/${TREE}/item/${KEY}			POST		Value		
+
+/trees/${TREE}/map/${prefix}/${key}		POST		Value
+
+/trees/${TREE}/intersection/${TREE}		GET				Intersection
+/trees/${TREE}/intersection/${TREE}/count	GET				Intersection count
+
+/trees/${TREE}/difference/${TREE}		GET				Difference
+/trees/${TREE}/difference/${TREE}/count		GET				Difference count
