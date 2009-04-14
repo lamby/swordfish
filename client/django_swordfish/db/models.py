@@ -226,7 +226,6 @@ class Tree(SwordfishQuerySet):
         if key is not None:
             return self.set(key, '')
 
-        # Delete entire tree not implemented yet
         self.make_call(
             '/trees/%s/delete/' % quote(self.tree),
             'POST',
