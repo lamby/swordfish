@@ -28,6 +28,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+from operator import attrgetter
+
 from django.db.models import Q
 from django.template import RequestContext
 from django.core.paginator import Paginator
@@ -123,7 +125,7 @@ def difference(request):
     # MySQL/Python difference (memory-bound, requires in-Python sorting)
     users = list(set(User.objects.filter(followers__src=a)) - \
         set(User.objects.filter(followers__src=b)))
-    users.sort()
+    users.sort(key=attrgetter('pk'))
 
     # Alternatively, use Swordfish
     users = TreeDifference('followed-by-%s' % a, 'followed-by-%s' % b)
