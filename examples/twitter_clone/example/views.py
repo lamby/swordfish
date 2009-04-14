@@ -128,6 +128,10 @@ def difference(request):
     #users.sort(key=attrgetter('pk'))
 
     # Alternatively, use Swordfish
+    users = TreeDifference('followed-by-%s' % a, 'followed-by-%s' % b). \
+        values().as_model(User)
+
+    # Alternatively, as our URLs are deterministic; just use the keys
     users = TreeDifference('followed-by-%s' % a, 'followed-by-%s' % b).keys()
 
     return render_to_response('difference.html', {
