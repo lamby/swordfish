@@ -110,7 +110,11 @@ def intersection(request):
         User.objects.filter(followers__src=b)
 
     # Alternatively, use Swordfish
-    users = TreeIntersection('followed-by-%s' % a, 'followed-by-%s' % b)
+    users = TreeIntersection('followed-by-%s' % a, 'followed-by-%s' % b). \
+        values().as_model(User)
+
+    # Alternatively, as our URLs are deterministic; just use the keys
+    users = TreeIntersection('followed-by-%s' % a, 'followed-by-%s' % b).keys()
 
     return render_to_response('intersection.html', {
         'a': a,
