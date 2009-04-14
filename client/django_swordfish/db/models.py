@@ -236,11 +236,11 @@ class Tree(SwordfishQuerySet):
 
     def map(self, prefix, key, value):
         """
-        >>> Tree('foo').keys().maps('prefix-', key, value)
+        >>> my_tree.keys().map(prefix, key, value)
 
         is equivalent to:
 
-        >>> for val in Tree('foo-%d' % ).keys():
+        >>> for val in my_tree.keys():
                 Tree('%s%s' % (prefix, val)).set(key, value)
         """
         assert self._values is not None, \
