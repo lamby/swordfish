@@ -360,33 +360,7 @@ handler_tree_difference(struct evhttp_request *request, char *left_key, char *ri
 	}
 
 	if ((left == NULL) && (right != NULL)) {
-		/* No left tree; emit everything on right tree */
-
-		if (result == RESULT_COUNT_ONLY) {
-			result_count = tctreernum(right);
-			goto end;
-		}
-
-		tctreeiterinit(right);
-		right_val = tctreeiternext2(right);
-
-		while (right_val)
-		{
-			if (result_count == limit)
-				break;
-
-			if (skip == 0) {
-				if (result_count++)
-					evbuffer_add_printf(databuf, ", ");
-				append_json_value(databuf, right_val);
-			} else {
-				/* Skip this element */
-				skip--;
-			}
-
-			right_val = tctreeiternext2(right);
-		}
-
+		/* No left tree; don't emit anything */
 		goto end;
 	}
 
@@ -432,19 +406,6 @@ handler_tree_difference(struct evhttp_request *request, char *left_key, char *ri
 
 		case 1:
 			/* left > right */
-			if (skip == 0) {
-				if (result == RESULT_ITEMS) {
-					if (result_count)
-						evbuffer_add_printf(databuf, ", ");
-					append_json_value(databuf, right_val);
-				}
-
-				++result_count;
-			} else {
-				/* Skip this element */
-				skip--;
-			}
-
 			right_val = tctreeiternext2(right);
 			break;
 		}
@@ -467,24 +428,6 @@ handler_tree_difference(struct evhttp_request *request, char *left_key, char *ri
 		}
 
 		left_val = tctreeiternext2(left);
-	}
-
-	while (right_val && (result_count != limit))
-	{
-		if (skip == 0) {
-			if (result == RESULT_ITEMS) {
-				if (result_count)
-					evbuffer_add_printf(databuf, ", ");
-				append_json_value(databuf, right_val);
-			}
-
-			++result_count;
-		} else {
-			/* Skip this element */
-			skip--;
-		}
-
-		right_val = tctreeiternext2(right);
 	}
 
 end:
