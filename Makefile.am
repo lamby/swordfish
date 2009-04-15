@@ -1,6 +1,6 @@
 SUBDIRS = src man
 
-EXTRA_DIST = examples
+EXTRA_DIST = examples client
 
 dist-hook:
 	find $(distdir) -type f -name "*.pyc" -delete
