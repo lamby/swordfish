@@ -139,4 +139,4 @@ AC_PROG_CC
 
 AC_MSG_NOTICE([Using CFLAGS="$CFLAGS"])
 AC_MSG_NOTICE([Using LIBS="$LIBS"])
-AC_OUTPUT(Makefile src/Makefile)
+AC_OUTPUT(Makefile src/Makefile man/Makefile)
