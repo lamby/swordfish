@@ -759,8 +759,8 @@ handler_tree_map(struct evhttp_request *request, char *src_key, char *prefix, ch
 
 	struct evbuffer *databuf = evbuffer_new();
 
-	TCTREE *src_tree;
-	TCTREE *dst_tree;
+	TCTREE *src_tree = NULL;
+	TCTREE *dst_tree = NULL;
 
 	if (request->type != EVHTTP_REQ_POST) {
 		evbuffer_add_printf(databuf,
@@ -921,7 +921,7 @@ void
 request_handler(struct evhttp_request *request, void *arg)
 {
 	char *uri;
-	char *saveptr;	
+	char *saveptr = NULL;
 
 	char *tree;
 	char *arg_1;
