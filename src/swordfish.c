@@ -814,8 +814,8 @@ handler_tree_map(struct evhttp_request *request, char *src_key, char *prefix, ch
 		elem_value = (map_from == RESULT_VALUES) ?
 			tctreeget2(src_tree, elem) : elem;
 
-		dst_key = (char*)malloc(strlen(prefix) + strlen(elem_value) + 1);
-		sprintf(dst_key, "%s%s", prefix, elem_value);
+		dst_key = (char*)malloc(strlen(prefix) + strlen(elem_value) + 2);
+		sprintf(dst_key, "%c%s%s", TYPE_TREE, prefix, elem_value);
 
 		rawtree = tchdbget(db, dst_key, strlen(dst_key), &rawtree_size);
 
@@ -917,13 +917,23 @@ get_int_header(struct evkeyvalq *querystr, const char *header, int def)
 	return (c && *c) ? atoi(c) : def;
 }
 
+char *
+get_tree_key(char resource_type, const char *string)
+{
+	char *result = (char *)malloc(strlen(string) + 2);
+
+	sprintf(result, "%c%s", resource_type, string);
+
+	return result;
+}
+
 void
 request_handler(struct evhttp_request *request, void *arg)
 {
 	char *uri;
 	char *saveptr = NULL;
 
-	char *tree;
+	char *tree = NULL;
 	char *arg_1;
 	char *arg_2;
 
@@ -955,6 +965,8 @@ request_handler(struct evhttp_request *request, void *arg)
 			/* no tree specified */
 			goto notfound;
 		}
+
+		tree = get_tree_key(TYPE_TREE, tree);
 
 		switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 
@@ -994,6 +1006,8 @@ request_handler(struct evhttp_request *request, void *arg)
 			if ((arg_1 = strtok_r(NULL, "/", &saveptr)) == NULL)
 				goto notfound;
 
+			arg_1 = get_tree_key(TYPE_TREE, arg_1);
+
 			switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 			case RESOURCE_NONE:
 				handler_tree_intersection(request, tree, arg_1,
@@ -1009,8 +1023,10 @@ request_handler(struct evhttp_request *request, void *arg)
 				
 			default:
 				/* unknown subcommand */
+				free(arg_1);
 				goto notfound;
 			}
+			free(arg_1);
 			break;
 
 		case RESOURCE_DIFFERENCE:
@@ -1018,6 +1034,8 @@ request_handler(struct evhttp_request *request, void *arg)
 			if ((arg_1 = strtok_r(NULL, "/", &saveptr)) == NULL)
 				goto notfound;
 
+			arg_1 = get_tree_key(TYPE_TREE, arg_1);
+
 			switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 			case RESOURCE_NONE:
 				handler_tree_difference(request, tree, arg_1,
@@ -1033,8 +1051,10 @@ request_handler(struct evhttp_request *request, void *arg)
 				
 			default:
 				/* unknown subcommand */
+				free(arg_1);
 				goto notfound;
 			}
+			free(arg_1);
 			break;
 
 		case RESOURCE_MAP:
@@ -1068,6 +1088,8 @@ notfound:
 
 end:
 	free(uri);
+	if (tree)
+		free(tree);
 	evbuffer_free(databuf);
 	evhttp_clear_headers(&querystr);
 }

@@ -36,6 +36,8 @@ struct config {
 
 #define SWORDFISH_KEY_CMP tccmplexical
 
+#define TYPE_TREE 'T'
+
 enum {
 	RESULT_COUNT,
 	RESULT_ALL,
