@@ -923,11 +923,29 @@ get_int_header(struct evkeyvalq *querystr, const char *header, int def)
 }
 
 char *
-get_tree_key(char resource_type, const char *string)
+get_tree_key(char resource_type, const char *uri)
 {
-	char *result = (char *)malloc(strlen(string) + 2);
+	int i;
+	char c;
 
-	sprintf(result, "%c%s", resource_type, string);
+	int j = 0;
+	char *result = (char *)malloc(strlen(uri) + 2);
+
+	result[j++] = resource_type;
+
+	for (i = 0; uri[i] != '\0'; i++) {
+		c = uri[i];
+		if (c == '%' && isxdigit((unsigned char)uri[i+1]) &&
+		    isxdigit((unsigned char)uri[i+2]))
+		{
+			char tmp[] = { uri[i+1], uri[i+2], '\0' };
+			c = (char)strtol(tmp, NULL, 16);
+			i += 2;
+		}
+		result[j++] = c;
+	}
+
+	result[j] = '\0';
 
 	return result;
 }
