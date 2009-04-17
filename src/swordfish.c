@@ -743,7 +743,7 @@ handler_tree_delete(struct evhttp_request *request, const char *key)
 }
 
 void
-handler_tree_map(struct evhttp_request *request, const char *src_key, char *template, const char *value_key, int map_from)
+handler_tree_map(struct evhttp_request *request, const char *src_key, const char *template, const char *value_key, int map_from)
 {
 	int size;
 	int ecode;
