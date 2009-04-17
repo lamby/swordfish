@@ -748,6 +748,7 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, char *temp
 	int size;
 	int ecode;
 	int post_size;
+	int base_key_size;
 
 	char *rawtree;
 	int rawtree_size;
@@ -764,6 +765,7 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, char *temp
 	TCTREE *dst_tree = NULL;
 
 	template_prefix = strsep(&template, "%");
+	base_key_size = strlen(template_prefix) + strlen(template) + 2;
 
 	if (request->type != EVHTTP_REQ_POST) {
 		evbuffer_add_printf(databuf,
@@ -817,7 +819,7 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, char *temp
 		elem_value = (map_from == RESULT_VALUES) ?
 			tctreeget2(src_tree, elem) : elem;
 
-		dst_key = (char *)malloc(strlen(template_prefix) + strlen(elem_value) + strlen(template) + 2);
+		dst_key = (char *)malloc(base_key_size + strlen(elem_value));
 		sprintf(dst_key, "%c%s%s%s", TYPE_TREE, template_prefix, elem_value, template);
 
 		rawtree = tchdbget(db, dst_key, strlen(dst_key), &rawtree_size);
