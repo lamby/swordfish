@@ -380,7 +380,7 @@ handler_tree_difference(struct evhttp_request *request, char *left_key, char *ri
 		goto end;
 	}
 
-	if ((left == NULL) && (right != NULL)) {
+	if (left == NULL) {
 		/* No left tree; don't emit anything */
 		goto end;
 	}
