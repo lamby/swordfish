@@ -927,7 +927,7 @@ get_int_header(struct evkeyvalq *querystr, const char *header, int def)
 }
 
 char *
-get_tree_key(char resource_type, const char *uri)
+get_typed_key(char resource_type, const char *uri)
 {
 	int i;
 	char c;
@@ -993,7 +993,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			goto notfound;
 		}
 
-		tree = get_tree_key(TYPE_TREE, tree);
+		tree = get_typed_key(TYPE_TREE, tree);
 
 		switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 
@@ -1033,7 +1033,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			if ((arg_1 = strtok_r(NULL, "/", &saveptr)) == NULL)
 				goto notfound;
 
-			arg_1 = get_tree_key(TYPE_TREE, arg_1);
+			arg_1 = get_typed_key(TYPE_TREE, arg_1);
 
 			switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 			case RESOURCE_NONE:
@@ -1061,7 +1061,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			if ((arg_1 = strtok_r(NULL, "/", &saveptr)) == NULL)
 				goto notfound;
 
-			arg_1 = get_tree_key(TYPE_TREE, arg_1);
+			arg_1 = get_typed_key(TYPE_TREE, arg_1);
 
 			switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 			case RESOURCE_NONE:
