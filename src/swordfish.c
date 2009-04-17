@@ -331,7 +331,12 @@ handler_tree_difference(struct evhttp_request *request, char *left_key, char *ri
 		free(value);
 	}
 
-	if ((left != NULL) && (right == NULL)) {
+	if (left == NULL) {
+		/* No left tree; don't emit anything */
+		goto end;
+	}
+
+	if (right == NULL) {
 		/* No right tree; emit everything on left tree */
 
 		if (result == RESULT_COUNT) {
@@ -377,11 +382,6 @@ handler_tree_difference(struct evhttp_request *request, char *left_key, char *ri
 			left_val = tctreeiternext2(left);
 		}
 
-		goto end;
-	}
-
-	if (left == NULL) {
-		/* No left tree; don't emit anything */
 		goto end;
 	}
 
