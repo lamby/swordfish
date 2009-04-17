@@ -891,7 +891,7 @@ get_values_value(struct evkeyvalq *querystr)
 }
 
 int
-lookup(const char *resource)
+lookup_resource(const char *resource)
 {
 	int i;
 	int num_cmds = sizeof(resource_lookup_table) / sizeof(*resource_lookup_table);
@@ -938,7 +938,7 @@ request_handler(struct evhttp_request *request, void *arg)
 	evhttp_parse_query(uri, &querystr);
 	strtok(uri, "?");
 
-	switch (lookup(strtok_r(uri, "/", &saveptr))) {
+	switch (lookup_resource(strtok_r(uri, "/", &saveptr))) {
 
 	case RESOURCE_SYNC:
 		handler_sync(request);
@@ -956,7 +956,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			goto notfound;
 		}
 
-		switch (lookup(strtok_r(NULL, "/", &saveptr))) {
+		switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 
 		case RESOURCE_NONE:
 			handler_tree_get(request, tree,
@@ -994,7 +994,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			if ((arg_1 = strtok_r(NULL, "/", &saveptr)) == NULL)
 				goto notfound;
 
-			switch (lookup(strtok_r(NULL, "/", &saveptr))) {
+			switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 			case RESOURCE_NONE:
 				handler_tree_intersection(request, tree, arg_1,
 					get_values_value(&querystr),
@@ -1018,7 +1018,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			if ((arg_1 = strtok_r(NULL, "/", &saveptr)) == NULL)
 				goto notfound;
 
-			switch (lookup(strtok_r(NULL, "/", &saveptr))) {
+			switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 			case RESOURCE_NONE:
 				handler_tree_difference(request, tree, arg_1,
 					get_values_value(&querystr),
