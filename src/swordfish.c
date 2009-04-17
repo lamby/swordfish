@@ -576,6 +576,97 @@ end:
 }
 
 void
+handler_counter_get(struct evhttp_request *request, const char *counter_key)
+{
+	int ecode;
+
+	char *rawcount;
+	int rawcount_size;
+
+	struct evbuffer *databuf = evbuffer_new();
+
+	rawcount = tchdbget(db, counter_key, strlen(counter_key), &rawcount_size);
+
+	if (rawcount) {
+		evbuffer_add_printf(databuf, "%s", rawcount);
+	} else {
+		ecode = tchdbecode(db);
+
+		if (ecode != TCENOREC) {
+			evbuffer_add_printf(databuf,
+				"{\"msg\": \"%s\"}", tchdberrmsg(ecode));
+			REPLY_INTERR(request, databuf);
+			goto end;
+		}
+
+		evbuffer_add_printf(databuf, "0");
+	}
+
+	REPLY_OK(request, databuf);
+
+end:
+	if (rawcount)
+		free(rawcount);
+
+	evbuffer_free(databuf);
+	++stats.total_cmds;
+}
+
+void
+handler_counter_set(struct evhttp_request *request, const char *counter_key)
+{
+	int size;
+	long long int val;
+
+	char rawcount[MAX_COUNTER_SIZE];
+
+	char *str;
+	char *endptr;
+
+	struct evbuffer *databuf = evbuffer_new();
+
+	if (request->ntoread) {
+		evbuffer_add_printf(databuf,
+			"{\"err\": \"Not enough POST data\"}");
+		REPLY_BADMETHOD(request, databuf);
+		goto end;
+	}
+
+	size = EVBUFFER_LENGTH(request->input_buffer);
+	str = (char *)malloc(size + 1);
+	memcpy(str, EVBUFFER_DATA(request->input_buffer), size);
+	str[size] = '\0';
+
+	val = strtoll(str, &endptr, 10);
+	free(str);
+
+	if (val == LONG_MAX || val < 0 || endptr == str) {
+		evbuffer_add_printf(databuf,
+			"{\"err\": \"Invalid counter value\"}");
+		REPLY_BADMETHOD(request, databuf);
+		goto end;
+	}
+
+	snprintf(rawcount, MAX_COUNTER_SIZE, "%lu", val);
+
+	if (!tchdbput(db, counter_key, strlen(counter_key), rawcount, strlen(rawcount))) {
+		int ecode = tchdbecode(db);
+
+		evbuffer_add_printf(databuf,
+			"{\"msg\": \"%s\"}", tchdberrmsg(ecode));
+		REPLY_INTERR(request, databuf);
+		goto end;
+	}
+
+	evbuffer_add_printf(databuf, "true");
+	REPLY_OK(request, databuf);
+
+end:
+	evbuffer_free(databuf);
+	++stats.total_cmds;
+}
+
+void
 handler_tree_get_item(struct evhttp_request *request, const char *tree_key, const char *value_key)
 {
 	int ecode;
@@ -984,6 +1075,24 @@ request_handler(struct evhttp_request *request, void *arg)
 	case RESOURCE_NONE:
 	case RESOURCE_STATS:
 		handler_stats(request);
+		break;
+
+	case RESOURCE_COUNTERS:
+		arg_1 = strtok_r(NULL, "/", &saveptr);
+		if (!arg_1) {
+			/* no count specified */
+			goto notfound;
+		}
+
+		arg_1 = get_typed_key(TYPE_COUNT, arg_1);
+
+		switch (request->type) {
+		case EVHTTP_REQ_POST:
+			handler_counter_set(request, arg_1);
+			break;
+		default:
+			handler_counter_get(request, arg_1);
+		}
 		break;
 
 	case RESOURCE_TREES:

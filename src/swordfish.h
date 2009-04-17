@@ -37,6 +37,9 @@ struct config {
 #define SWORDFISH_KEY_CMP tccmplexical
 
 #define TYPE_TREE 'T'
+#define TYPE_COUNT 'C'
+
+#define MAX_COUNTER_SIZE 30
 
 enum {
 	RESULT_COUNT,
@@ -47,6 +50,7 @@ enum {
 
 const char *resource_lookup_table[] = {
 	"trees",
+	"counters",
 	"intersection",
 	"difference",
 	"count",
@@ -61,6 +65,7 @@ const char *resource_lookup_table[] = {
 
 enum {
 	RESOURCE_TREES,
+	RESOURCE_COUNTERS,
 	RESOURCE_INTERSECTION,
 	RESOURCE_DIFFERENCE,
 	RESOURCE_COUNT,
