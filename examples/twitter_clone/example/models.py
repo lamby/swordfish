@@ -72,4 +72,4 @@ class Message(models.Model):
         #
         # This step could be done asynchronously if required - the above call
         # could still be made sychronously to maintain the illusion.
-        Tree('follower-of-%s' % self.user).keys().map('messages-for-', key, self.pk)
+        Tree('follower-of-%s' % self.user).keys().map('messages-for-%', key, self.pk)

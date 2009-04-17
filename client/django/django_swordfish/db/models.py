@@ -233,14 +233,14 @@ class Tree(SwordfishQuerySet):
         )
         self.invalidate_cache()
 
-    def map(self, prefix, key, value):
+    def map(self, template, key, value):
         """
-        >>> my_tree.keys().map(prefix, key, value)
+        >>> my_tree.keys().map(template, key, value)
 
         is equivalent to:
 
         >>> for val in my_tree.keys():
-                Tree('%s%s' % (prefix, val)).set(key, value)
+                Tree(template.replace('%', val, 1)).set(key, value)
         """
         assert self._values is not None, \
             "map() must be called after one of keys() or values()"
@@ -248,7 +248,7 @@ class Tree(SwordfishQuerySet):
         self.make_call(
             '/trees/%s/map/%s/%s?values=%s' % (
                 quote(self.tree),
-                quote(prefix),
+                template,
                 quote(key),
                 self._values,
             ),
