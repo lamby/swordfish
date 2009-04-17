@@ -89,4 +89,4 @@ INTERNAL_IPS = (
 
 SWORDFISH_SERVER="127.0.0.1:2929"
 import sys
-sys.path.insert(0, '../../client')
+sys.path.insert(0, '../../client/django')
