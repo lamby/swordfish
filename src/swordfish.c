@@ -176,7 +176,7 @@ end:
 }
 
 void
-handler_tree_intersection(struct evhttp_request *request, char *left_key, char *right_key, int result, int skip, int limit)
+handler_tree_intersection(struct evhttp_request *request, const char *left_key, const char *right_key, int result, int skip, int limit)
 {
 	int size;
 	int cmp_val;
@@ -294,7 +294,7 @@ end:
 }
 
 void
-handler_tree_difference(struct evhttp_request *request, char *left_key, char *right_key, int result, int skip, int limit)
+handler_tree_difference(struct evhttp_request *request, const char *left_key, const char *right_key, int result, int skip, int limit)
 {
 	int size;
 	int cmp_val;
@@ -496,7 +496,7 @@ end:
 }
 
 void
-handler_tree_set_item(struct evhttp_request *request, char *tree_key, char *value_key)
+handler_tree_set_item(struct evhttp_request *request, const char *tree_key, const char *value_key)
 {
 	int size;
 	int ecode;
@@ -576,7 +576,7 @@ end:
 }
 
 void
-handler_tree_get_item(struct evhttp_request *request, char *tree_key, char *value_key)
+handler_tree_get_item(struct evhttp_request *request, const char *tree_key, const char *value_key)
 {
 	int ecode;
 
@@ -630,7 +630,7 @@ end:
 }
 
 void
-handler_tree_get(struct evhttp_request *request, char *key, int result, int skip, int limit)
+handler_tree_get(struct evhttp_request *request, const char *key, int result, int skip, int limit)
 {
 	int ecode;
 	int result_count = 0;
@@ -720,7 +720,7 @@ end:
 }
 
 void
-handler_tree_delete(struct evhttp_request *request, char *key)
+handler_tree_delete(struct evhttp_request *request, const char *key)
 {
 	struct evbuffer *databuf = evbuffer_new();
 
@@ -743,7 +743,7 @@ handler_tree_delete(struct evhttp_request *request, char *key)
 }
 
 void
-handler_tree_map(struct evhttp_request *request, char *src_key, char *prefix, char *value_key, int map_from)
+handler_tree_map(struct evhttp_request *request, const char *src_key, const char *prefix, char *value_key, int map_from)
 {
 	int size;
 	int ecode;
