@@ -43,7 +43,7 @@ enum {
 	RESULT_VALUES,
 };
 
-const char *lookup_table[] = {
+const char *resource_lookup_table[] = {
 	"trees",
 	"intersection",
 	"difference",

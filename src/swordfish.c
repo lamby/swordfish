@@ -894,13 +894,13 @@ int
 lookup(const char *resource)
 {
 	int i;
-	int num_cmds = sizeof(lookup_table) / sizeof(*lookup_table);
+	int num_cmds = sizeof(resource_lookup_table) / sizeof(*resource_lookup_table);
 
 	if (!resource)
 		return RESOURCE_NONE;
 
 	for (i = 0; i != num_cmds; ++i) {
-		if (strcmp(resource, lookup_table[i]) == 0)
+		if (strcmp(resource, resource_lookup_table[i]) == 0)
 			return i;
 	}
 
