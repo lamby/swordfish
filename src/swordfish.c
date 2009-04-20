@@ -148,32 +148,16 @@ handler_sync(struct evhttp_request *request)
 void
 handler_stats(struct evhttp_request *request)
 {
-	struct stat file_status;
 	struct evbuffer *databuf = evbuffer_new();
-
-	char *db_realpath = tcrealpath(tchdbpath(db));
-	if (stat(db_realpath, &file_status)) {
-		perror("stat");
-		goto fail;
-	}
 
 	evbuffer_add_printf(databuf, "{");
 	evbuffer_add_printf(databuf,   "\"started\": %lu", stats.started);
 	evbuffer_add_printf(databuf, ", \"total_cmds\": %lu", stats.total_cmds);
 	evbuffer_add_printf(databuf, ", \"version\": \"%s\"", PACKAGE_VERSION);
-	evbuffer_add_printf(databuf, ", \"database\": \"%s\"", db_realpath);
-	evbuffer_add_printf(databuf, ", \"num_items\": %zu", tchdbrnum(db));
-	evbuffer_add_printf(databuf, ", \"database_bytes\": %jd", (intmax_t)file_status.st_size);
 	evbuffer_add_printf(databuf, ", \"tokyocabinet_version\": \"%s\"", tcversion);
 	evbuffer_add_printf(databuf, "}\n");
 
 	REPLY_OK(request, databuf);
-
-	goto end;
-fail:	
-	REPLY_INTERR(request, databuf);
-end:
-	free(db_realpath);
 	evbuffer_free(databuf);
 }
 
