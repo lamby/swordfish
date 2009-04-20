@@ -42,6 +42,7 @@ struct config config;
 extern char *optarg;
 
 TCHDB *db = NULL;
+char *db_name = NULL;
 
 void
 send_reply(struct evhttp_request *request, struct evbuffer *databuf, int errorcode, const char *reason)
@@ -1086,6 +1087,39 @@ request_handler(struct evhttp_request *request, void *arg)
 			goto notfound;
 		}
 
+		if ((db_name == NULL) || strcmp(database, db_name) != 0) {
+#ifdef DEBUG
+			printf("Switching database from \"%s\" => \"%s\"\n",
+				db_name ? db_name : "(none)", database);
+#endif
+
+			if (db != NULL)
+				tchdbdel(db);
+
+			db = tchdbnew();
+
+			if (!tchdbopen(db, database, HDBOWRITER | HDBOCREAT)) {
+				int ecode = tchdbecode(db);
+
+#ifdef DEBUG
+				printf("Could not open database \"%s\": %s\n",
+					database, tchdberrmsg(ecode));
+#endif
+
+				evbuffer_add_printf(databuf,
+					"{\"msg\": \"%s\"}", tchdberrmsg(ecode));
+				REPLY_INTERR(request, databuf);
+
+				goto end;
+			}
+
+			if (db_name != NULL)
+				free(db_name);
+
+			db_name = (char*)malloc(strlen(database) + 1);
+			strcpy(db_name, database);
+		}
+
 		switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 		case RESOURCE_COUNTERS:
 			arg_1 = strtok_r(NULL, "/", &saveptr);
@@ -1272,13 +1306,16 @@ exit_handler(void)
 {
 	int ecode;
 
-	if (db && (!tchdbclose(db))) {
-		ecode = tchdbecode(db);
-		fprintf(stderr, "tchdbdel: %s\n", tchdberrmsg(ecode));
-		exit(EXIT_FAILURE);
-	}
+	if ((db != NULL)) {
+		
+		if (!tchdbclose(db)) {
+			ecode = tchdbecode(db);
+			fprintf(stderr, "tchdbdel: %s\n", tchdberrmsg(ecode));
+			exit(EXIT_FAILURE);
+		}
 
-	tchdbdel(db);
+		tchdbdel(db);
+	}
 
 	if (config.pidfile)
 		unlink(config.pidfile);
