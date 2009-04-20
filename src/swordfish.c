@@ -1305,7 +1305,7 @@ main(int argc, char** argv)
 			config.port = atoi(optarg);
 			if (!config.port) {
 				usage(argv[0]);
-				exit(EXIT_FAILURE);
+				return EXIT_FAILURE;
 			}
 			break;
 		case 'h':
@@ -1316,7 +1316,7 @@ main(int argc, char** argv)
 			break;
 		default:
 			usage(argv[0]);
-			exit(EXIT_FAILURE);
+			return EXIT_FAILURE;
 		}
 
 	event_init();
@@ -1326,7 +1326,7 @@ main(int argc, char** argv)
 	if (!tchdbopen(db, config.database, HDBOWRITER | HDBOCREAT)) {
 		ecode = tchdbecode(db);
 		fprintf(stderr, "Open fail: %s\n", tchdberrmsg(ecode));
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	struct sigaction sa;
@@ -1334,7 +1334,7 @@ main(int argc, char** argv)
 	sa.sa_flags = 0;
 	if ((sigemptyset(&sa.sa_mask) == -1) || (sigaction(SIGPIPE, &sa, 0) == -1)) {
 		perror("failed to ignore SIGPIPE; sigaction");
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	if (signal(SIGTERM, sig_handler) == SIG_ERR)
@@ -1346,14 +1346,14 @@ main(int argc, char** argv)
 
 	if (atexit(exit_handler)) {
 		fprintf(stderr, "Could not register atexit(..)\n");
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	if ((http_server = evhttp_start(config.host, config.port)) == NULL) {
 		fprintf(stderr,
 			"Cannot listen on http://%s:%d/; exiting..\n",
 			config.host, config.port);
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	evhttp_set_gencb(http_server, request_handler, NULL);
