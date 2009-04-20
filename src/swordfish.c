@@ -984,7 +984,7 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, const char
 	REPLY_OK(request, databuf);
 
 end:
-	free(template_decoded);
+	free(template_prefix);
 	evbuffer_free(databuf);
 	++stats.total_cmds;
 }
