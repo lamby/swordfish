@@ -132,7 +132,9 @@ handler_sync(struct evhttp_request *request)
 
 	switch (request->type) {
 	case EVHTTP_REQ_POST:
-		tchdbsync(db);
+		if (db != NULL)
+			tchdbsync(db);
+
 		evbuffer_add_printf(databuf, "true\n");
 		REPLY_OK(request, databuf);
 		break;
