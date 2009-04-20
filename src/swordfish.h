@@ -49,6 +49,7 @@ enum {
 };
 
 const char *resource_lookup_table[] = {
+	"database",
 	"trees",
 	"counters",
 	"intersection",
@@ -64,6 +65,7 @@ const char *resource_lookup_table[] = {
 };
 
 enum {
+	RESOURCE_DATABASE,
 	RESOURCE_TREES,
 	RESOURCE_COUNTERS,
 	RESOURCE_INTERSECTION,

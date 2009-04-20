@@ -1052,6 +1052,7 @@ request_handler(struct evhttp_request *request, void *arg)
 	char *uri;
 	char *saveptr = NULL;
 
+	char *database = NULL;
 	char *arg_1 = NULL;
 	char *arg_2 = NULL;
 	char *arg_3 = NULL;
@@ -1078,136 +1079,151 @@ request_handler(struct evhttp_request *request, void *arg)
 		handler_stats(request);
 		break;
 
-	case RESOURCE_COUNTERS:
-		arg_1 = strtok_r(NULL, "/", &saveptr);
-		if (!arg_1) {
-			/* no count specified */
+	case RESOURCE_DATABASE:
+		database = strtok_r(NULL, "/", &saveptr);
+		if (!database) {
+			/* no database specified */
 			goto notfound;
 		}
-
-		arg_1 = get_typed_key(TYPE_COUNT, arg_1);
-
-		switch (request->type) {
-		case EVHTTP_REQ_POST:
-			handler_counter_set(request, arg_1);
-			break;
-		default:
-			handler_counter_get(request, arg_1);
-		}
-		break;
-
-	case RESOURCE_TREES:
-		arg_1 = strtok_r(NULL, "/", &saveptr);
-		if (!arg_1) {
-			/* no tree specified */
-			goto notfound;
-		}
-
-		arg_1 = get_typed_key(TYPE_TREE, arg_1);
 
 		switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
-
-		case RESOURCE_NONE:
-			handler_tree_get(request, arg_1,
-				get_values_value(&querystr),
-				get_int_header(&querystr, "skip", 0),
-				get_int_header(&querystr, "limit", 0));
-			break;
-
-		case RESOURCE_ITEM:
-			if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+		case RESOURCE_COUNTERS:
+			arg_1 = strtok_r(NULL, "/", &saveptr);
+			if (!arg_1) {
+				/* no count specified */
 				goto notfound;
+			}
+
+			arg_1 = get_typed_key(TYPE_COUNT, arg_1);
 
 			switch (request->type) {
 			case EVHTTP_REQ_POST:
-				handler_tree_set_item(request, arg_1, arg_2);
+				handler_counter_set(request, arg_1);
 				break;
 			default:
-				handler_tree_get_item(request, arg_1, arg_2);
+				handler_counter_get(request, arg_1);
 			}
 			break;
 
-		case RESOURCE_COUNT:
-			handler_tree_get(request, arg_1, RESULT_COUNT,
-				get_int_header(&querystr, "skip", 0),
-				get_int_header(&querystr, "limit", 0));
-			break;
-
-		case RESOURCE_DELETE:
-			/* delete tree `tree` */
-			handler_tree_delete(request, arg_1);
-			break;
-
-		case RESOURCE_INTERSECTION:
-			/* return intersection of `tree` and `arg_2` */
-			if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+		case RESOURCE_TREES:
+			arg_1 = strtok_r(NULL, "/", &saveptr);
+			if (!arg_1) {
+				/* no tree specified */
 				goto notfound;
+			}
 
-			arg_2 = get_typed_key(TYPE_TREE, arg_2);
+			arg_1 = get_typed_key(TYPE_TREE, arg_1);
 
 			switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
+
 			case RESOURCE_NONE:
-				handler_tree_intersection(request, arg_1, arg_2,
+				handler_tree_get(request, arg_1,
 					get_values_value(&querystr),
 					get_int_header(&querystr, "skip", 0),
 					get_int_header(&querystr, "limit", 0));
 				break;
 
-			case RESOURCE_COUNT:
-				handler_tree_intersection(request, arg_1, arg_2,
-					RESULT_COUNT, 0, -1);
+			case RESOURCE_ITEM:
+				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+					goto notfound;
+
+				switch (request->type) {
+				case EVHTTP_REQ_POST:
+					handler_tree_set_item(request, arg_1, arg_2);
+					break;
+				default:
+					handler_tree_get_item(request, arg_1, arg_2);
+				}
 				break;
-				
-			default:
-				/* unknown subcommand */
-				free(arg_2);
-				goto notfound;
-			}
-			free(arg_2);
-			break;
 
-		case RESOURCE_DIFFERENCE:
-			/* return difference between `tree` and `arg_2` */
-			if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
-				goto notfound;
-
-			arg_2 = get_typed_key(TYPE_TREE, arg_2);
-
-			switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
-			case RESOURCE_NONE:
-				handler_tree_difference(request, arg_1, arg_2,
-					get_values_value(&querystr),
+			case RESOURCE_COUNT:
+				handler_tree_get(request, arg_1, RESULT_COUNT,
 					get_int_header(&querystr, "skip", 0),
 					get_int_header(&querystr, "limit", 0));
 				break;
 
-			case RESOURCE_COUNT:
-				handler_tree_difference(request, arg_1, arg_2,
-					RESULT_COUNT, 0, -1);
+			case RESOURCE_DELETE:
+				/* delete tree `tree` */
+				handler_tree_delete(request, arg_1);
 				break;
+
+			case RESOURCE_INTERSECTION:
+				/* return intersection of `tree` and `arg_2` */
+				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+					goto notfound;
+
+				arg_2 = get_typed_key(TYPE_TREE, arg_2);
+
+				switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
+				case RESOURCE_NONE:
+					handler_tree_intersection(request, arg_1, arg_2,
+						get_values_value(&querystr),
+						get_int_header(&querystr, "skip", 0),
+						get_int_header(&querystr, "limit", 0));
+					break;
+
+				case RESOURCE_COUNT:
+					handler_tree_intersection(request, arg_1, arg_2,
+						RESULT_COUNT, 0, -1);
+					break;
+					
+				default:
+					/* unknown subcommand */
+					free(arg_2);
+					goto notfound;
+				}
+				free(arg_2);
+				break;
+
+			case RESOURCE_DIFFERENCE:
+				/* return difference between `tree` and `arg_2` */
+				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+					goto notfound;
+
+				arg_2 = get_typed_key(TYPE_TREE, arg_2);
+
+				switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
+				case RESOURCE_NONE:
+					handler_tree_difference(request, arg_1, arg_2,
+						get_values_value(&querystr),
+						get_int_header(&querystr, "skip", 0),
+						get_int_header(&querystr, "limit", 0));
+					break;
+
+				case RESOURCE_COUNT:
+					handler_tree_difference(request, arg_1, arg_2,
+						RESULT_COUNT, 0, -1);
+					break;
+					
+				default:
+					/* unknown subcommand */
+					free(arg_2);
+					goto notfound;
+				}
+				free(arg_2);
+				break;
+
+			case RESOURCE_MAP:
+				/* map contents of `tree` using template `arg_2` */
+				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+					goto notfound;
+
+				if ((arg_3 = strtok_r(NULL, "/", &saveptr)) == NULL)
+					goto notfound;
+
+				handler_tree_map(request, arg_1, arg_2, arg_3, get_values_value(&querystr));
 				
+				break;
+
 			default:
 				/* unknown subcommand */
-				free(arg_2);
 				goto notfound;
 			}
-			free(arg_2);
-			break;
 
-		case RESOURCE_MAP:
-			/* map contents of `tree` using template `arg_2` */
-			if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
-				goto notfound;
-
-			if ((arg_3 = strtok_r(NULL, "/", &saveptr)) == NULL)
-				goto notfound;
-
-			handler_tree_map(request, arg_1, arg_2, arg_3, get_values_value(&querystr));
-			
 			break;
 
 		default:
-			/* unknown subcommand */
+			/* unknown sub-database entity */
 			goto notfound;
 		}
 
