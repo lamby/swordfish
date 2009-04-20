@@ -182,6 +182,13 @@ class SwordfishQuerySet(object):
                 'You must set SWORDFISH_SERVER in settings.py'
             )
 
+        try:
+            path = "/database/%s%s" % (settings.SWORDFISH_DATABASE, path)
+        except AttributeError:
+            raise ImproperlyConfigured(
+                'You must set SWORDFISH_DATABASE in settings.py'
+            )
+
         headers = {}
         if data is not None:
             headers['Content-Length'] = len(data)

@@ -88,5 +88,6 @@ INTERNAL_IPS = (
 )
 
 SWORDFISH_SERVER="127.0.0.1:2929"
+SWORDFISH_DATABASE="twitter_clone"
 import sys
 sys.path.insert(0, '../../client/django')
