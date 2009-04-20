@@ -617,7 +617,7 @@ void
 handler_counter_set(struct evhttp_request *request, const char *counter_key)
 {
 	int size;
-	long long int val;
+	long unsigned int val;
 
 	char rawcount[MAX_COUNTER_SIZE];
 
@@ -641,7 +641,7 @@ handler_counter_set(struct evhttp_request *request, const char *counter_key)
 	val = strtoll(str, &endptr, 10);
 	free(str);
 
-	if (val == LONG_MAX || val < 0 || endptr == str) {
+	if (val == LONG_MAX || endptr == str) {
 		evbuffer_add_printf(databuf,
 			"{\"err\": \"Invalid counter value\"}");
 		REPLY_BADMETHOD(request, databuf);
