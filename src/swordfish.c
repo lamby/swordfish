@@ -1251,8 +1251,8 @@ void
 usage(const char *progname)
 {
 	fprintf(stderr,
-		"%s\n"
-		"\t -D database    database file\n"
+		"%s [..options..]\n"
+		"\t -d datadir     data directory\n"
 		"\t -i interface   interface to run server on\n"
 		"\t -P port        port number to run server on\n"
 		"\t -p pidfile     daemonise and write pid to <pidfile>\n"
@@ -1309,10 +1309,10 @@ main(int argc, char** argv)
 	/* set defaults */
 	config.host = "127.0.0.1";
 	config.port = 2929;
-	config.database = "swordfish.db";
+	config.datadir = ".";
 	config.pidfile = NULL;
 
-	while ((ch = getopt(argc, argv, "p:P:D:")) != -1)
+	while ((ch = getopt(argc, argv, "p:P:d:")) != -1)
 		switch(ch) {
 		case 'p':
 			config.pidfile = optarg;
@@ -1327,8 +1327,8 @@ main(int argc, char** argv)
 		case 'h':
 			config.host = optarg;
 			break;
-		case 'D':
-			config.database = optarg;
+		case 'd':
+			config.datadir = optarg;
 			break;
 		default:
 			usage(argv[0]);
@@ -1338,10 +1338,8 @@ main(int argc, char** argv)
 	event_init();
 	stats_init();
 
-	db = tchdbnew();
-	if (!tchdbopen(db, config.database, HDBOWRITER | HDBOCREAT)) {
-		ecode = tchdbecode(db);
-		fprintf(stderr, "Open fail: %s\n", tchdberrmsg(ecode));
+	if (chdir(config.datadir) == -1) {
+		perror("Could not chdir to datadir");
 		return EXIT_FAILURE;
 	}
 
@@ -1390,11 +1388,6 @@ main(int argc, char** argv)
 
 		if (setsid() == -1) {
 			perror("setsid");
-			return EXIT_FAILURE;
-		}
-
-		if (chdir("/") == -1) {
-			perror("chdir");
 			return EXIT_FAILURE;
 		}
 

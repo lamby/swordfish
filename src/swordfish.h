@@ -23,7 +23,7 @@ struct stats {
 
 struct config {
 	const char* host;
-	const char* database;
+	const char* datadir;
 	short port;
 	const char* pidfile;
 };
