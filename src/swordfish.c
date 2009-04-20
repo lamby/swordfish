@@ -162,6 +162,34 @@ handler_stats(struct evhttp_request *request)
 }
 
 void
+handler_stats_database(struct evhttp_request *request)
+{
+	struct stat file_status;
+	struct evbuffer *databuf = evbuffer_new();
+
+	char *db_realpath = tcrealpath(tchdbpath(db));
+	if (stat(db_realpath, &file_status)) {
+		perror("stat");
+		goto fail;
+	}
+
+	evbuffer_add_printf(databuf, "{");
+	evbuffer_add_printf(databuf, "  \"database\": \"%s\"", db_realpath);
+	evbuffer_add_printf(databuf, ", \"num_items\": %zu", tchdbrnum(db));
+	evbuffer_add_printf(databuf, ", \"database_bytes\": %jd", (intmax_t)file_status.st_size);
+	evbuffer_add_printf(databuf, "}\n");
+
+	REPLY_OK(request, databuf);
+
+	goto end;
+fail:	
+	REPLY_INTERR(request, databuf);
+end:
+	free(db_realpath);
+	evbuffer_free(databuf);
+}
+
+void
 handler_tree_intersection(struct evhttp_request *request, const char *left_key, const char *right_key, int result, int skip, int limit)
 {
 	int size;
@@ -1105,6 +1133,10 @@ request_handler(struct evhttp_request *request, void *arg)
 		}
 
 		switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
+		case RESOURCE_STATS:
+			handler_stats_database(request);
+			break;
+
 		case RESOURCE_COUNTERS:
 			arg_1 = strtok_r(NULL, "/", &saveptr);
 			if (!arg_1) {
