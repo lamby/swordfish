@@ -1,24 +1,56 @@
+Scheme: /sync
+Method: POST
+ Sync server with disk
 
-URI						METHOD		INPUT		OUTPUT
-=====================================================================================================
-/stats						GET				server statistics
-/sync						POST				sync server with disk
+Uri: /stats
+Method: GET
+ Server statistics
 
-/database/${DATABASE}/stats			GET				get server statistics
+Scheme: /database/${DATABASE}/stats
+Method: GET
+ Database statistics
 
-/database/${DATABASE}/count/${COUNTER}/				GET				Value
-/database/${DATABASE}/count/${COUNTER}/				POST		Value
+Scheme: /database/${DATABASE}/count/${COUNTER}
+Method: GET
+ Counter value
 
-/database/${DATABASE}/trees/${TREE}/					GET				Items in tree
-/database/${DATABASE}/trees/${TREE}/count/				GET				Items in tree
+Scheme: /database/${DATABASE}/count/${COUNTER}
+Method: POST
+ Set (unsigned) counter value
 
-/database/${DATABASE}/trees/${TREE}/item/${KEY}			GET				Value at key
-/database/${DATABASE}/trees/${TREE}/item/${KEY}			POST		Value		
+Scheme: /database/${DATABASE}/trees/${TREE}/
+Method: GET
+ Items in tree
 
-/database/${DATABASE}/trees/${TREE}/map/${prefix}/${key}		POST		Value
+Scheme: /database/${DATABASE}/trees/${TREE}/count
+Method: GET
+ Items in tree
 
-/database/${DATABASE}/trees/${TREE}/intersection/${TREE}		GET				Intersection
-/database/${DATABASE}/trees/${TREE}/intersection/${TREE}/count	GET				Intersection count
+Scheme: /database/${DATABASE}/trees/${TREE}/item/${KEY}
+Method: GET
+ Get tree value
 
-/database/${DATABASE}/trees/${TREE}/difference/${TREE}		GET				Difference
-/database/${DATABASE}/trees/${TREE}/difference/${TREE}/count		GET				Difference count
+Scheme: /database/${DATABASE}/trees/${TREE}/item/${KEY}
+Method: POST
+ Set new tree value.
+
+Scheme: /database/${DATABASE}/trees/${TREE}/map/${TEMPLATE}/${KEY}
+Method: POST
+ Map values from ${TREE} using template ${TEMPLATE}, using key value
+ ${KEY} and value from POST data.
+
+Scheme: /database/${DATABASE}/trees/${TREE}/intersection/${TREE}
+Method: GET
+ Intersection
+
+Scheme: /database/${DATABASE}/trees/${TREE}/intersection/${TREE}/count
+Method: GET
+ Intersection count
+
+Scheme: /database/${DATABASE}/trees/${TREE}/difference/${TREE}
+Method: GET
+ Difference
+
+Scheme: /database/${DATABASE}/trees/${TREE}/difference/${TREE}/count
+Method: GET
+ Difference count.
