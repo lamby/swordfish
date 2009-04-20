@@ -4,19 +4,21 @@ URI						METHOD		INPUT		OUTPUT
 /stats						GET				server statistics
 /sync						POST				sync server with disk
 
-/count/${COUNTER}/				GET				Value
-/count/${COUNTER}/				POST		Value
+/database/${DATABASE}/stats			GET				get server statistics
 
-/trees/${TREE}/					GET				Items in tree
-/trees/${TREE}/count/				GET				Items in tree
+/database/${DATABASE}/count/${COUNTER}/				GET				Value
+/database/${DATABASE}/count/${COUNTER}/				POST		Value
 
-/trees/${TREE}/item/${KEY}			GET				Value at key
-/trees/${TREE}/item/${KEY}			POST		Value		
+/database/${DATABASE}/trees/${TREE}/					GET				Items in tree
+/database/${DATABASE}/trees/${TREE}/count/				GET				Items in tree
 
-/trees/${TREE}/map/${prefix}/${key}		POST		Value
+/database/${DATABASE}/trees/${TREE}/item/${KEY}			GET				Value at key
+/database/${DATABASE}/trees/${TREE}/item/${KEY}			POST		Value		
 
-/trees/${TREE}/intersection/${TREE}		GET				Intersection
-/trees/${TREE}/intersection/${TREE}/count	GET				Intersection count
+/database/${DATABASE}/trees/${TREE}/map/${prefix}/${key}		POST		Value
 
-/trees/${TREE}/difference/${TREE}		GET				Difference
-/trees/${TREE}/difference/${TREE}/count		GET				Difference count
+/database/${DATABASE}/trees/${TREE}/intersection/${TREE}		GET				Intersection
+/database/${DATABASE}/trees/${TREE}/intersection/${TREE}/count	GET				Intersection count
+
+/database/${DATABASE}/trees/${TREE}/difference/${TREE}		GET				Difference
+/database/${DATABASE}/trees/${TREE}/difference/${TREE}/count		GET				Difference count
