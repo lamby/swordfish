@@ -278,7 +278,7 @@ class Database(object):
                 raise ImproperlyConfigured(
                     'You must set SWORDFISH_DATABASE in settings.py'
                 )
-        else
+        else:
             self.database = database
 
     def __repr__(self):
