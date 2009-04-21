@@ -89,8 +89,8 @@ send_reply(struct evhttp_request *request, struct evbuffer *databuf, int errorco
 		break;
 	}
 	
-	fprintf(stderr, "[%s] %d %s %s\n",
-		request->remote_host, errorcode, method, request->uri);
+	swordfish_debug(("[%s] %d %s %s\n",
+		request->remote_host, errorcode, method, request->uri));
 #endif
 }
 
@@ -1122,10 +1122,8 @@ request_handler(struct evhttp_request *request, void *arg)
 		}
 
 		if ((db_name == NULL) || strcmp(database, db_name) != 0) {
-#ifdef DEBUG
-			printf("Switching database from \"%s\" => \"%s\"\n",
-				db_name ? db_name : "(none)", database);
-#endif
+			swordfish_debug(("Switching database from \"%s\" => \"%s\"\n",
+				db_name ? db_name : "(none)", database));
 
 			if (db != NULL)
 				tchdbdel(db);
@@ -1135,10 +1133,8 @@ request_handler(struct evhttp_request *request, void *arg)
 			if (!tchdbopen(db, database, HDBOWRITER | HDBOCREAT)) {
 				int ecode = tchdbecode(db);
 
-#ifdef DEBUG
-				printf("Could not open database \"%s\": %s\n",
-					database, tchdberrmsg(ecode));
-#endif
+				swordfish_debug(("Could not open database \"%s\": %s\n",
+					database, tchdberrmsg(ecode)));
 
 				evbuffer_add_printf(databuf,
 					"{\"msg\": \"%s\"}", tchdberrmsg(ecode));
@@ -1476,7 +1472,7 @@ main(int argc, char** argv)
 		fclose(fp);
 	}
 
-	fprintf(stderr, "Listening on http://%s:%d/ ...\n",
+	swordfish_info("Listening on http://%s:%d/ ...\n",
 		config.host, config.port);
 
 	event_dispatch();
