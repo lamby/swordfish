@@ -1358,7 +1358,6 @@ int
 main(int argc, char** argv)
 {
 	int ch;
-	int ecode;
 	struct evhttp *http_server = NULL;
 
 	/* set defaults */
