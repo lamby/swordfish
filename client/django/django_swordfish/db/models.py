@@ -270,6 +270,12 @@ class Database(object):
     def __repr__(self):
         return "<Swordfish database %r>" % self.database
 
+    def stats(self):
+        return make_call('/stats')
+
+    def delete(self):
+        return make_call('/delete', method='POST')
+
 class TreeCommand(SwordfishQuerySet):
     def __init__(self, left_tree, right_tree):
         super(TreeCommand, self).__init__()
