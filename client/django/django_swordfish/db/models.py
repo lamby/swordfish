@@ -66,7 +66,10 @@ def make_call(path, method='GET', data=None):
         headers['Content-Length'] = len(data)
 
     conn.request(method, path, data, headers)
-    val = conn.getresponse().read()
+    response = conn.getresponse()
+    assert response.status == 200, "Server status %d != 200" % response.status
+
+    val = response.read()
 
     try:
         return simplejson.loads(val)
