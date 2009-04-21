@@ -841,6 +841,29 @@ end:
 }
 
 void
+handler_database_delete(struct evhttp_request *request)
+{
+	struct evbuffer *databuf = evbuffer_new();
+
+	switch (request->type) {
+	case EVHTTP_REQ_POST:
+		swordfish_info("Flushing database %s\n", db_name);
+		tchdbvanish(db);
+		evbuffer_add_printf(databuf, "true");
+		REPLY_OK(request, databuf);
+		break;
+
+	default:
+		evbuffer_add_printf(databuf,
+			"{\"err\": \"delete should be POST\"}");
+		REPLY_BADMETHOD(request, databuf);
+	}
+
+	evbuffer_free(databuf);
+	++stats.total_cmds;
+}
+
+void
 handler_tree_delete(struct evhttp_request *request, const char *key)
 {
 	struct evbuffer *databuf = evbuffer_new();
@@ -1146,6 +1169,10 @@ request_handler(struct evhttp_request *request, void *arg)
 		switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
 		case RESOURCE_STATS:
 			handler_stats_database(request);
+			break;
+
+		case RESOURCE_DELETE:
+			handler_database_delete(request);
 			break;
 
 		case RESOURCE_COUNTERS:
