@@ -102,7 +102,7 @@ AC_CACHE_CHECK([for tokyocabinet directory], ac_cv_tokyocabinet_dir, [
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
-#include <stdint.h>], [ TCBDB *d = tcbdbnew(); ],
+#include <stdint.h>], [ TCBDB *d = tcbdbnew(); TCTREE *tree = NULL;],
        [ tokyocabinet_linked=yes ], [ tokyocabinet_linked=no ])
     if test $tokyocabinet_linked = yes; then
        if test ! -z "$ledir" ; then
