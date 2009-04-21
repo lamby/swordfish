@@ -270,8 +270,16 @@ class Tree(SwordfishQuerySet):
         )
 
 class Database(object):
-    def __init__(self, database):
-        self.database = database
+    def __init__(self, database=None):
+        if database is None:
+            try:
+                database = settings.SWORDFISH_DATABASE
+            except AttributeError:
+                raise ImproperlyConfigured(
+                    'You must set SWORDFISH_DATABASE in settings.py'
+                )
+        else
+            self.database = database
 
     def __repr__(self):
         return "<Swordfish database %r>" % self.database
