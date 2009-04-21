@@ -41,7 +41,7 @@ from django_swordfish.utils import SwordfishError
 
 REPR_OUTPUT_SIZE = 20
 
-__all__ = ('Tree', 'TreeIntersection')
+__all__ = ('Database', 'Tree', 'TreeIntersection')
 
 def make_call(path, method='GET', data=None):
     try:
@@ -262,6 +262,13 @@ class Tree(SwordfishQuerySet):
             'POST',
             str(value),
         )
+
+class Database(object):
+    def __init__(self, database):
+        self.database = database
+
+    def __repr__(self):
+        return "<Swordfish database %r>" % self.database
 
 class TreeCommand(SwordfishQuerySet):
     def __init__(self, left_tree, right_tree):
