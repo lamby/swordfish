@@ -1,0 +1,32 @@
+#!/bin/sh
+
+. _testcase
+
+POST /database/${DB}/trees/two/item/bbb b-value
+POST /database/${DB}/trees/two/item/ccc c-value
+POST /database/${DB}/trees/two/item/ddd d-value
+
+GET /database/${DB}/trees/one
+Assert '{"items": []}'
+
+GET /database/${DB}/trees/two
+Assert '{"items": [["bbb","b-value"],["ccc","c-value"],["ddd","d-value"]]}'
+
+# Difference
+
+GET /database/${DB}/trees/one/difference/two
+Assert '{"items": []}'
+
+GET /database/${DB}/trees/one/difference/two\?values=all
+Assert '{"items": []}'
+
+GET /database/${DB}/trees/one/difference/two\?values=keys
+Assert '{"items": []}'
+
+GET /database/${DB}/trees/one/difference/two\?values=values
+Assert '{"items": []}'
+
+# Counts
+
+GET /database/${DB}/trees/one/difference/two/count
+Assert '{"count": 0}'
