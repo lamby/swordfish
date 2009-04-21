@@ -43,6 +43,33 @@ REPR_OUTPUT_SIZE = 20
 
 __all__ = ('Tree', 'TreeIntersection')
 
+def make_call(path, method='GET', data=None):
+    try:
+        conn = httplib.HTTPConnection(settings.SWORDFISH_SERVER)
+    except AttributeError:
+        raise ImproperlyConfigured(
+            'You must set SWORDFISH_SERVER in settings.py'
+        )
+
+    try:
+        path = "/database/%s%s" % (settings.SWORDFISH_DATABASE, path)
+    except AttributeError:
+        raise ImproperlyConfigured(
+            'You must set SWORDFISH_DATABASE in settings.py'
+        )
+
+    headers = {}
+    if data is not None:
+        headers['Content-Length'] = len(data)
+
+    conn.request(method, path, data, headers)
+    val = conn.getresponse().read()
+
+    try:
+        return simplejson.loads(val)
+    except ValueError:
+        raise SwordfishError('Error decoding JSON')
+
 class SwordfishQuerySet(object):
     def __init__(self):
         self.low_mark = 0
@@ -79,7 +106,7 @@ class SwordfishQuerySet(object):
         )
 
         if self.result_cache is None:
-            self.result_cache = self.make_call(uri)['items']
+            self.result_cache = make_call(uri)['items']
         items = self.result_cache
 
         if self.model is None:
@@ -128,7 +155,7 @@ class SwordfishQuerySet(object):
     def count(self):
         if self.count_cache is None:
             if self.result_cache is None:
-                self.count_cache = self.make_call(
+                self.count_cache = make_call(
                     self.get_count_uri()
                 )['count']
             else:
@@ -174,33 +201,6 @@ class SwordfishQuerySet(object):
             else:
                 self.low_mark = self.low_mark + low
 
-    def make_call(self, path, method='GET', data=None):
-        try:
-            conn = httplib.HTTPConnection(settings.SWORDFISH_SERVER)
-        except AttributeError:
-            raise ImproperlyConfigured(
-                'You must set SWORDFISH_SERVER in settings.py'
-            )
-
-        try:
-            path = "/database/%s%s" % (settings.SWORDFISH_DATABASE, path)
-        except AttributeError:
-            raise ImproperlyConfigured(
-                'You must set SWORDFISH_DATABASE in settings.py'
-            )
-
-        headers = {}
-        if data is not None:
-            headers['Content-Length'] = len(data)
-
-        conn.request(method, path, data, headers)
-        val = conn.getresponse().read()
-
-        try:
-            return simplejson.loads(val)
-        except ValueError:
-            raise SwordfishError('Error decoding JSON')
-
     def invalidate_cache(self):
         self.count_cache = None
         self.result_cache = None
@@ -221,7 +221,7 @@ class Tree(SwordfishQuerySet):
             self._values is None and self.model is None, \
                 "Must call .set() or .delete() on base Tree()"
 
-        self.make_call(
+        make_call(
             '/trees/%s/item/%s/' % (quote(self.tree), quote(str(key))),
             'POST',
             str(value),
@@ -233,7 +233,7 @@ class Tree(SwordfishQuerySet):
         if key is not None:
             return self.set(key, '')
 
-        self.make_call(
+        make_call(
             '/trees/%s/delete/' % quote(self.tree),
             'POST',
             '',
@@ -252,7 +252,7 @@ class Tree(SwordfishQuerySet):
         assert self._values is not None, \
             "map() must be called after one of keys() or values()"
 
-        self.make_call(
+        make_call(
             '/trees/%s/map/%s/%s?values=%s' % (
                 quote(self.tree),
                 template,
