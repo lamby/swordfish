@@ -16,6 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __GNUC__
+#define CHECK_FMT(a,b) __attribute__((format(printf, a, b)))
+#else
+#define CHECK_FMT(a,b)
+#endif
+
+void _swordfish_debug(const char *format, ...) CHECK_FMT(1, 2);
+void swordfish_info(const char *format, ...) CHECK_FMT(1, 2);
+
+#ifdef DEBUG
+#define swordfish_debug(x) _swordfish_debug x
+#else
+#define swordfish_debug(x) do {;} while (0)
+#endif
+
 struct stats {
 	uint64_t total_cmds;
 	time_t started;

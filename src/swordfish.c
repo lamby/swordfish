@@ -45,6 +45,26 @@ TCHDB *db = NULL;
 char *db_name = NULL;
 
 void
+_swordfish_debug(const char *format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	fprintf(stderr, "[debug] ");
+	vfprintf(stderr, format, args);
+	va_end(args);
+}
+
+void
+swordfish_info(const char *format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	fprintf(stderr, " [info] ");
+	vfprintf(stderr, format, args);
+	va_end(args);
+}
+
+void
 send_reply(struct evhttp_request *request, struct evbuffer *databuf, int errorcode, const char *reason)
 {
 
