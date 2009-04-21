@@ -6,6 +6,8 @@ POST /database/${DB}/trees/treename/item/zzz z-value
 GET /database/${DB}/trees/treename/item/zzz
 Assert '{"item": "z-value"}'
 
+# Check items
+
 GET /database/${DB}/trees/treename
 Assert '{"items": [["zzz","z-value"]]}'
 
@@ -17,3 +19,17 @@ Assert '{"items": ["zzz"]}'
 
 GET /database/${DB}/trees/treename\?values=values
 Assert '{"items": ["z-value"]}'
+
+# Check counts
+
+GET /database/${DB}/trees/treename/count
+Assert '{"count": 1}'
+
+GET /database/${DB}/trees/treename/count\?values=all
+Assert '{"count": 1}'
+
+GET /database/${DB}/trees/treename/count\?values=keys
+Assert '{"count": 1}'
+
+GET /database/${DB}/trees/treename/count\?values=keys
+Assert '{"count": 1}'

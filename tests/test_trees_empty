@@ -3,7 +3,9 @@
 . _testcase
 
 GET /database/${DB}/trees/treename
-
 Assert '{"items": []}'
+
+GET /database/${DB}/trees/treename/count
+Assert '{"count": 0}'
 
 ! GET /database/${DB}/trees/treename/item/asd

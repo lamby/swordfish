@@ -9,9 +9,15 @@ POST /database/${DB}/trees/treename/item/aaa "value"
 GET /database/${DB}/trees/treename
 Assert '{"items": [["aaa","value"]]}'
 
+GET /database/${DB}/trees/treename/count
+Assert '{"count": 1}'
+
 POST /database/${DB}/trees/treename/item/aaa ""
 
 ! GET /database/${DB}/trees/treename/item/aaa
 
 GET /database/${DB}/trees/treename
 Assert '{"items": []}'
+
+GET /database/${DB}/trees/treename/count
+Assert '{"count": 0}'

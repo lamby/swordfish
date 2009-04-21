@@ -35,3 +35,17 @@ Assert '{"items": ["aaa","zzz"]}'
 
 GET /database/${DB}/trees/treename\?values=values
 Assert '{"items": ["zzzz-value","z-value"]}'
+
+# Checkout counts
+
+GET /database/${DB}/trees/treename/count
+Assert '{"count": 2}'
+
+GET /database/${DB}/trees/treename/count\?values=all
+Assert '{"count": 2}'
+
+GET /database/${DB}/trees/treename/count\?values=keys
+Assert '{"count": 2}'
+
+GET /database/${DB}/trees/treename/count\?values=keys
+Assert '{"count": 2}'
