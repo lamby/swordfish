@@ -19,3 +19,4 @@ config.sub
 *.db
 *.pyc
 *.sqlite
+swordfish-*
