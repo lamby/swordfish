@@ -535,7 +535,6 @@ void
 handler_tree_set_item(struct evhttp_request *request, const char *tree_key, const char *value_key)
 {
 	int size;
-	int ecode;
 
 	int rawtree_size;
 	void *rawtree;
@@ -549,7 +548,7 @@ handler_tree_set_item(struct evhttp_request *request, const char *tree_key, cons
 		tree = tctreeload(rawtree, rawtree_size, SWORDFISH_KEY_CMP, NULL);
 		free(rawtree);
 	} else {
-		ecode = tchdbecode(db);
+		int ecode = tchdbecode(db);
 
 		if (ecode != TCENOREC) {
 			evbuffer_add_printf(databuf,
@@ -589,7 +588,7 @@ handler_tree_set_item(struct evhttp_request *request, const char *tree_key, cons
 
 	rawtree = tctreedump(tree, &size);
 	if (!tchdbput(db, tree_key, strlen(tree_key), rawtree, size)) {
-		ecode = tchdbecode(db);
+		int ecode = tchdbecode(db);
 		free(rawtree);
 
 		evbuffer_add_printf(databuf,
@@ -614,8 +613,6 @@ end:
 void
 handler_counter_get(struct evhttp_request *request, const char *counter_key)
 {
-	int ecode;
-
 	char *rawcount;
 	int rawcount_size;
 
@@ -626,7 +623,7 @@ handler_counter_get(struct evhttp_request *request, const char *counter_key)
 	if (rawcount) {
 		evbuffer_add_printf(databuf, "%s", rawcount);
 	} else {
-		ecode = tchdbecode(db);
+		int ecode = tchdbecode(db);
 
 		if (ecode != TCENOREC) {
 			evbuffer_add_printf(databuf,
@@ -705,8 +702,6 @@ end:
 void
 handler_tree_get_item(struct evhttp_request *request, const char *tree_key, const char *value_key)
 {
-	int ecode;
-
 	int rawtree_size;
 	char *rawtree;
 
@@ -718,7 +713,7 @@ handler_tree_get_item(struct evhttp_request *request, const char *tree_key, cons
 	rawtree = tchdbget(db, tree_key, strlen(tree_key), &rawtree_size);
 
 	if (!rawtree) {
-		ecode = tchdbecode(db);
+		int ecode = tchdbecode(db);
 
 		if (ecode != TCENOREC) {
 			evbuffer_add_printf(databuf,
@@ -759,7 +754,6 @@ end:
 void
 handler_tree_get(struct evhttp_request *request, const char *key, int result, int skip, int limit)
 {
-	int ecode;
 	int result_count = 0;
 
 	int rawtree_size;
@@ -773,7 +767,7 @@ handler_tree_get(struct evhttp_request *request, const char *key, int result, in
 	rawtree = tchdbget(db, key, strlen(key), &rawtree_size);
 
 	if (!rawtree) {
-		ecode = tchdbecode(db);
+		int ecode = tchdbecode(db);
 
 		if (ecode != TCENOREC) {
 			evbuffer_add_printf(databuf,
@@ -873,7 +867,6 @@ void
 handler_tree_map(struct evhttp_request *request, const char *src_key, const char *template, const char *value_key, int map_from)
 {
 	int size;
-	int ecode;
 	int post_size;
 	int base_key_size;
 
@@ -921,7 +914,7 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, const char
 	rawtree = tchdbget(db, src_key, strlen(src_key), &rawtree_size);
 
 	if (!rawtree) {
-		ecode = tchdbecode(db);
+		int ecode = tchdbecode(db);
 
 		if (ecode != TCENOREC) {
 			evbuffer_add_printf(databuf,
@@ -958,7 +951,7 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, const char
 			dst_tree = tctreeload(rawtree, rawtree_size, SWORDFISH_KEY_CMP, NULL);
 			free(rawtree);
 		} else {
-			ecode = tchdbecode(db);
+			int ecode = tchdbecode(db);
 
 			if (ecode != TCENOREC) {
 				free(dst_key);
@@ -980,7 +973,7 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, const char
 		rawtree = tctreedump(dst_tree, &size);
 
 		if (!tchdbput(db, dst_key, strlen(dst_key), rawtree, size)) {
-			ecode = tchdbecode(db);
+			int ecode = tchdbecode(db);
 
 			free(rawtree);
 			free(dst_key);
