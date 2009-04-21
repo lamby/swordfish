@@ -50,6 +50,7 @@ struct config {
 #define REPLY_INTERR(req, buf) send_reply(req, buf, 500, "Internal Server Error")
 
 #define SWORDFISH_KEY_CMP tccmplexical
+#define SWORDFISH_CONTENT_TYPE "text/plain"
 
 #define TYPE_TREE 'T'
 #define TYPE_COUNT 'C'

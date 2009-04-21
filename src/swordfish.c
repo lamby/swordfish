@@ -69,7 +69,7 @@ send_reply(struct evhttp_request *request, struct evbuffer *databuf, int errorco
 {
 
 	evhttp_add_header(request->output_headers,
-		"Content-Type", "text/plain"); // "application/json");
+		"Content-Type", SWORDFISH_CONTENT_TYPE);
 	evhttp_add_header(request->output_headers,
 		"Server", PACKAGE_NAME "/" PACKAGE_VERSION);
 	evhttp_send_reply(request, errorcode, reason, databuf);
