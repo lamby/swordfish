@@ -900,6 +900,14 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, const char
 
 	template_decoded = evhttp_decode_uri(template);
 	template_prefix = strsep(&template_decoded, "%");
+
+	if (!template_decoded) {
+		evbuffer_add_printf(databuf,
+			"{\"err\": \"No placeholder %% in template\"}");
+		REPLY_BADREQUEST(request, databuf);
+		goto end;
+	}
+
 	base_key_size = strlen(template_prefix) + strlen(template_decoded) + 2;
 
 	if (request->type != EVHTTP_REQ_POST) {
