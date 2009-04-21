@@ -58,6 +58,9 @@ def make_call(path, method='GET', data=None):
             'You must set SWORDFISH_DATABASE in settings.py'
         )
 
+    if method == 'POST' and data is None:
+        data = ''
+
     headers = {}
     if data is not None:
         headers['Content-Length'] = len(data)
