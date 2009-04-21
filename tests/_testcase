@@ -42,13 +42,13 @@ POST () {
 	URI="${1}"
 	DATA="${2:-}"
 
-	RET="$(curl --data "${DATA}" http://${SERVER_HOST}:${SERVER_PORT}${URI} 2>/dev/null)"
+	RET="$(wget -q -O- --post-data "${DATA}" http://${SERVER_HOST}:${SERVER_PORT}${URI})"
 }
 
 GET () {
 	URI="${1}"
 
-	RET="$(curl http://${SERVER_HOST}:${SERVER_PORT}${URI} 2>/dev/null)"
+	RET="$(wget -q -O- http://${SERVER_HOST}:${SERVER_PORT}${URI})"
 }
 
 # Flush testing database
