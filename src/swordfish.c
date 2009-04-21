@@ -26,7 +26,6 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
-#include <sys/stat.h>
 
 #include <event.h>
 #include <evhttp.h>
@@ -186,27 +185,18 @@ handler_stats(struct evhttp_request *request)
 void
 handler_stats_database(struct evhttp_request *request)
 {
-	struct stat file_status;
 	struct evbuffer *databuf = evbuffer_new();
 
 	char *db_realpath = tcrealpath(tchdbpath(db));
-	if (stat(db_realpath, &file_status)) {
-		perror("stat");
-		goto fail;
-	}
 
 	evbuffer_add_printf(databuf, "{");
-	evbuffer_add_printf(databuf, "  \"database\": \"%s\"", db_realpath);
+	evbuffer_add_printf(databuf, "\"database\": \"%s\"", db_realpath);
 	evbuffer_add_printf(databuf, ", \"num_items\": %zu", tchdbrnum(db));
-	evbuffer_add_printf(databuf, ", \"database_bytes\": %jd", (intmax_t)file_status.st_size);
+	evbuffer_add_printf(databuf, ", \"database_bytes\": %jd", tchdbfsiz(db));
 	evbuffer_add_printf(databuf, "}\n");
 
 	REPLY_OK(request, databuf);
 
-	goto end;
-fail:	
-	REPLY_INTERR(request, databuf);
-end:
 	free(db_realpath);
 	evbuffer_free(databuf);
 }
