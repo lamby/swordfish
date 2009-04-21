@@ -8,7 +8,7 @@ FAILED=0
 
 FAILED_TESTS=""
 
-for TEST in ./test_*.sh
+for TEST in test_*
 do
 	TESTS=$(($TESTS+1))
 
