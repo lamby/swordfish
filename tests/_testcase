@@ -38,6 +38,23 @@ Exit () {
 
 trap Exit EXIT
 
+Assert () {
+	VAL="${1:-}"
+
+	if [ "${RET}" = "${VAL}" ]
+	then
+		return 0
+	fi
+
+	if [ ${RUNNER} = 0 ]
+	then
+		printf 'Assertion failed: %s != %s\n' "${RET}" "${VAL}"
+	fi
+
+	return 1
+}
+		
+
 POST () {
 	URI="${1}"
 	DATA="${2:-}"
