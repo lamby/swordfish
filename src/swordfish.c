@@ -46,9 +46,19 @@ char *db_name = NULL;
 void
 _swordfish_log(const char *level, const char *format, ...)
 {
+	time_t curtime;
+	struct tm *loctime;
+	char timestamp[30];
+
 	va_list args;
 	va_start(args, format);
-	fprintf(stderr, "[%s] ", level);
+
+	curtime = time(NULL);
+	loctime = localtime(&curtime);
+
+	strftime(timestamp, sizeof(timestamp), "%d-%m-%Y %H:%M:%S %z", loctime);
+
+	fprintf(stderr, "%s [%s] ", timestamp, level);
 	vfprintf(stderr, format, args);
 	va_end(args);
 }
