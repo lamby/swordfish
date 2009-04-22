@@ -1496,6 +1496,14 @@ main(int argc, char** argv)
 		close(fd);
 
 		fp = fopen(config.pidfile, "w");
+
+		if (!fp) {
+			swordfish_fatal("Could not write pidfile \"%s\", exiting..\n",
+				config.pidfile);
+
+			return EXIT_FAILURE;
+		}
+
 		fprintf(fp, "%d\n", getpid());
 		fclose(fp);
 	}
