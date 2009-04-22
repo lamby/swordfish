@@ -1410,6 +1410,21 @@ sig_handler_exit(const int sig)
 	exit(EXIT_SUCCESS);
 }
 
+static void
+sig_handler_hangup(const int sig)
+{
+	if (!config.logfile)
+		return;
+
+	int fd = open(config.logfile, O_WRONLY | O_APPEND | O_CREAT, 0644);
+
+	if (fd == -1)
+		return;
+
+	dup2(fd, STDERR_FILENO);
+	close(fd);
+}
+
 int
 main(int argc, char** argv)
 {
@@ -1471,6 +1486,9 @@ main(int argc, char** argv)
 		swordfish_warn("Can not catch SIGQUIT\n");
 	if (signal(SIGINT, sig_handler_exit) == SIG_ERR)
 		swordfish_warn("Can not catch SIGINT\n");
+
+	if (signal(SIGHUP, sig_handler_hangup) == SIG_ERR)
+		swordfish_warn("Can not catch SIGHUP\n");
 
 	if ((http_server = evhttp_start(config.host, config.port)) == NULL) {
 		swordfish_fatal(
