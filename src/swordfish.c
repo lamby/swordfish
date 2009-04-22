@@ -58,7 +58,17 @@ swordfish_info(const char *format, ...)
 {
 	va_list args;
 	va_start(args, format);
-	fprintf(stderr, " [info] ");
+	fprintf(stderr, "[info] ");
+	vfprintf(stderr, format, args);
+	va_end(args);
+}
+
+void
+swordfish_warn(const char *format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	fprintf(stderr, "[warn] ");
 	vfprintf(stderr, format, args);
 	va_end(args);
 }
@@ -68,7 +78,7 @@ swordfish_fatal(const char *format, ...)
 {
 	va_list args;
 	va_start(args, format);
-	fprintf(stderr, "[error] ");
+	fprintf(stderr, "[fatal] ");
 	vfprintf(stderr, format, args);
 	va_end(args);
 }
@@ -1374,7 +1384,7 @@ exit_handler(void)
 		
 		if (!tchdbclose(db)) {
 			ecode = tchdbecode(db);
-			fprintf(stderr, "tchdbdel: %s\n", tchdberrmsg(ecode));
+			swordfish_warn("tchdbdel: %s\n", tchdberrmsg(ecode));
 			exit(EXIT_FAILURE);
 		}
 
@@ -1393,7 +1403,7 @@ sig_handler(const int sig)
 	if (sig != SIGTERM && sig != SIGQUIT && sig != SIGINT)
 		return;
 
-	fprintf(stderr, "Caught signal %d, exiting...\n", sig);
+	swordfish_info("Caught signal %d, exiting...\n", sig);
 
 	exit_handler();
 
@@ -1456,16 +1466,17 @@ main(int argc, char** argv)
 	}
 
 	if (signal(SIGTERM, sig_handler) == SIG_ERR)
-		fprintf(stderr, "Can not catch SIGTERM\n");
+		swordfish_warn("Can not catch SIGTERM\n");
 	if (signal(SIGQUIT, sig_handler) == SIG_ERR)
-		fprintf(stderr, "Can not catch SIGQUIT\n");
+		swordfish_warn("Can not catch SIGQUIT\n");
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
-		fprintf(stderr, "Can not catch SIGINT\n");
+		swordfish_warn("Can not catch SIGINT\n");
 
 	if ((http_server = evhttp_start(config.host, config.port)) == NULL) {
-		fprintf(stderr,
+		swordfish_fatal(
 			"Cannot listen on http://%s:%d/; exiting..\n",
 			config.host, config.port);
+
 		return EXIT_FAILURE;
 	}
 
@@ -1524,7 +1535,7 @@ main(int argc, char** argv)
 		config.host, config.port);
 
 	if (atexit(exit_handler)) {
-		fprintf(stderr, "Could not register atexit(..)\n");
+		swordfish_fatal("Could not register atexit(..)\n");
 		return EXIT_FAILURE;
 	}
 

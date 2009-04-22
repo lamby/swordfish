@@ -25,6 +25,7 @@
 void _swordfish_debug(const char *format, ...) CHECK_FMT(1, 2);
 void swordfish_info(const char *format, ...) CHECK_FMT(1, 2);
 void swordfish_fatal(const char *format, ...) CHECK_FMT(1, 2);
+void swordfish_warn(const char *format, ...) CHECK_FMT(1, 2);
 
 #ifdef DEBUG
 #define swordfish_debug(x) _swordfish_debug x
