@@ -1448,11 +1448,6 @@ main(int argc, char** argv)
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
 		fprintf(stderr, "Can not catch SIGINT\n");
 
-	if (atexit(exit_handler)) {
-		fprintf(stderr, "Could not register atexit(..)\n");
-		return EXIT_FAILURE;
-	}
-
 	if ((http_server = evhttp_start(config.host, config.port)) == NULL) {
 		fprintf(stderr,
 			"Cannot listen on http://%s:%d/; exiting..\n",
@@ -1494,6 +1489,11 @@ main(int argc, char** argv)
 
 	swordfish_info("Listening on http://%s:%d/ ...\n",
 		config.host, config.port);
+
+	if (atexit(exit_handler)) {
+		fprintf(stderr, "Could not register atexit(..)\n");
+		return EXIT_FAILURE;
+	}
 
 	event_dispatch();
 
