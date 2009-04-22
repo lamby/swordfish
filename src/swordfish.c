@@ -1398,7 +1398,7 @@ exit_handler(void)
 }
 
 static void
-sig_handler(const int sig)
+sig_handler_exit(const int sig)
 {
 	if (sig != SIGTERM && sig != SIGQUIT && sig != SIGINT)
 		return;
@@ -1465,11 +1465,11 @@ main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	if (signal(SIGTERM, sig_handler) == SIG_ERR)
+	if (signal(SIGTERM, sig_handler_exit) == SIG_ERR)
 		swordfish_warn("Can not catch SIGTERM\n");
-	if (signal(SIGQUIT, sig_handler) == SIG_ERR)
+	if (signal(SIGQUIT, sig_handler_exit) == SIG_ERR)
 		swordfish_warn("Can not catch SIGQUIT\n");
-	if (signal(SIGINT, sig_handler) == SIG_ERR)
+	if (signal(SIGINT, sig_handler_exit) == SIG_ERR)
 		swordfish_warn("Can not catch SIGINT\n");
 
 	if ((http_server = evhttp_start(config.host, config.port)) == NULL) {
