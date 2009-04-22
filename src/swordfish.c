@@ -1403,7 +1403,7 @@ sig_handler(const int sig)
 int
 main(int argc, char** argv)
 {
-	int ch;
+	int ch, fd;
 	struct evhttp *http_server = NULL;
 
 	/* set defaults */
@@ -1411,8 +1411,9 @@ main(int argc, char** argv)
 	config.port = 2929;
 	config.datadir = ".";
 	config.pidfile = NULL;
+	config.logfile = NULL;
 
-	while ((ch = getopt(argc, argv, "p:P:d:")) != -1)
+	while ((ch = getopt(argc, argv, "p:P:d:l:")) != -1)
 		switch(ch) {
 		case 'p':
 			config.pidfile = optarg;
@@ -1429,6 +1430,9 @@ main(int argc, char** argv)
 			break;
 		case 'd':
 			config.datadir = optarg;
+			break;
+		case 'l':
+			config.logfile = optarg;
 			break;
 		default:
 			usage(argv[0]);
@@ -1469,7 +1473,6 @@ main(int argc, char** argv)
 
 	if (config.pidfile) {
 		FILE *fp;
-		int fd;
 
 		switch (fork()) {
 		case -1:
@@ -1495,6 +1498,18 @@ main(int argc, char** argv)
 		fp = fopen(config.pidfile, "w");
 		fprintf(fp, "%d\n", getpid());
 		fclose(fp);
+	}
+
+	if (config.logfile) {
+		if ((fd = open(config.logfile, O_WRONLY | O_APPEND | O_CREAT, 0644)) == -1) {
+			swordfish_fatal("Could not open logfile \"%s\", exiting..\n",
+				config.logfile);
+
+			return EXIT_FAILURE;
+		}
+
+		dup2(fd, STDERR_FILENO);
+		close(fd);
 	}
 
 	swordfish_info("Listening on http://%s:%d/ ...\n",

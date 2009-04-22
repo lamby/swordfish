@@ -42,6 +42,7 @@ struct config {
 	const char* datadir;
 	short port;
 	const char* pidfile;
+	const char* logfile;
 };
 
 #define REPLY_OK(req, buf) send_reply(req, buf, HTTP_OK, "OK")
