@@ -44,41 +44,11 @@ TCHDB *db = NULL;
 char *db_name = NULL;
 
 void
-_swordfish_debug(const char *format, ...)
+_swordfish_log(const char *level, const char *format, ...)
 {
 	va_list args;
 	va_start(args, format);
-	fprintf(stderr, "[debug] ");
-	vfprintf(stderr, format, args);
-	va_end(args);
-}
-
-void
-swordfish_info(const char *format, ...)
-{
-	va_list args;
-	va_start(args, format);
-	fprintf(stderr, "[info] ");
-	vfprintf(stderr, format, args);
-	va_end(args);
-}
-
-void
-swordfish_warn(const char *format, ...)
-{
-	va_list args;
-	va_start(args, format);
-	fprintf(stderr, "[warn] ");
-	vfprintf(stderr, format, args);
-	va_end(args);
-}
-
-void
-swordfish_fatal(const char *format, ...)
-{
-	va_list args;
-	va_start(args, format);
-	fprintf(stderr, "[fatal] ");
+	fprintf(stderr, "[%s] ", level);
 	vfprintf(stderr, format, args);
 	va_end(args);
 }
@@ -108,8 +78,8 @@ send_reply(struct evhttp_request *request, struct evbuffer *databuf, int errorco
 		break;
 	}
 	
-	swordfish_debug(("[%s] %d %s %s\n",
-		request->remote_host, errorcode, method, request->uri));
+	swordfish_debug("[%s] %d %s %s\n",
+		request->remote_host, errorcode, method, request->uri);
 #endif
 }
 
@@ -1156,8 +1126,8 @@ request_handler(struct evhttp_request *request, void *arg)
 		}
 
 		if ((db_name == NULL) || strcmp(database, db_name) != 0) {
-			swordfish_debug(("Switching database from \"%s\" => \"%s\"\n",
-				db_name ? db_name : "(none)", database));
+			swordfish_debug("Switching database from \"%s\" => \"%s\"\n",
+				db_name ? db_name : "(none)", database);
 
 			if (db != NULL)
 				tchdbdel(db);
@@ -1167,8 +1137,8 @@ request_handler(struct evhttp_request *request, void *arg)
 			if (!tchdbopen(db, database, HDBOWRITER | HDBOCREAT)) {
 				int ecode = tchdbecode(db);
 
-				swordfish_debug(("Could not open database \"%s\": %s\n",
-					database, tchdberrmsg(ecode)));
+				swordfish_debug("Could not open database \"%s\": %s\n",
+					database, tchdberrmsg(ecode));
 
 				evbuffer_add_printf(databuf,
 					"{\"msg\": \"%s\"}", tchdberrmsg(ecode));

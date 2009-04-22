@@ -22,15 +22,16 @@
 #define CHECK_FMT(a,b)
 #endif
 
-void _swordfish_debug(const char *format, ...) CHECK_FMT(1, 2);
-void swordfish_info(const char *format, ...) CHECK_FMT(1, 2);
-void swordfish_fatal(const char *format, ...) CHECK_FMT(1, 2);
-void swordfish_warn(const char *format, ...) CHECK_FMT(1, 2);
+void _swordfish_log(const char *level, const char *format, ...) CHECK_FMT(2, 3);
+
+#define swordfish_info(args...) _swordfish_log("info", ## args);
+#define swordfish_warn(args...) _swordfish_log("warn", ## args);
+#define swordfish_fatal(args...) _swordfish_log("fatal", ## args);
 
 #ifdef DEBUG
-#define swordfish_debug(x) _swordfish_debug x
+#define swordfish_debug(args...) _swordfish_log("debug", ## args);
 #else
-#define swordfish_debug(x) do {;} while (0)
+#define swordfish_debug(args...) do {;} while (0)
 #endif
 
 struct stats {
