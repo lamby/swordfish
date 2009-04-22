@@ -3,4 +3,4 @@
 PREFIX="/usr"
 CONFIG="/etc/swordfish/swordfish.conf"
 
-exec ${PREFIX}/swordfish $(grep -v ^# "${CONFIG}" | tr '\n' ' ')
+exec ${PREFIX}/bin/swordfish $(grep -v ^# "${CONFIG}" | tr '\n' ' ')
