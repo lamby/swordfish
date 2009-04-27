@@ -33,3 +33,10 @@ Assert '{"count": 1}'
 
 GET /database/${DB}/trees/treename/count\?values=keys
 Assert '{"count": 1}'
+
+# Overwrite value
+
+POST /database/${DB}/trees/treename/item/zzz new-value
+
+GET /database/${DB}/trees/treename
+Assert '{"items": [["zzz","new-value"]]}'
