@@ -925,12 +925,6 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, const char
 	}
 
 	post_size = EVBUFFER_LENGTH(request->input_buffer);
-	if (!post_size) {
-		evbuffer_add_printf(databuf,
-			"{\"err\": \"Size of POST data must be > 0\"}");
-		REPLY_BADMETHOD(request, databuf);
-		goto end;
-	}
 
 	rawtree = tchdbget(db, src_key, strlen(src_key), &rawtree_size);
 
@@ -985,11 +979,28 @@ handler_tree_map(struct evhttp_request *request, const char *src_key, const char
 				goto end;
 			}
 
+			/* We're trying to delete, but the target tree does not exist */
+			if (post_size == 0) {
+				free(dst_key);
+				continue;
+			}
+
 			dst_tree = tctreenew2(SWORDFISH_KEY_CMP, NULL);
 		}
 
-		tctreeput(dst_tree, value_key, strlen(value_key),
-			EVBUFFER_DATA(request->input_buffer), post_size);
+		if (post_size == 0) {
+			tctreeout2(dst_tree, value_key);
+
+			if (tctreernum(dst_tree) == 0) {
+				tctreedel(dst_tree);
+				tchdbout2(db, dst_key);
+				free(dst_key);
+				continue;
+			}
+		} else {
+			tctreeput(dst_tree, value_key, strlen(value_key),
+				EVBUFFER_DATA(request->input_buffer), post_size);
+		}
 
 		rawtree = tctreedump(dst_tree, &size);
 
