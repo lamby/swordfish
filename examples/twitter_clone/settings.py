@@ -87,6 +87,7 @@ INTERNAL_IPS = (
     '127.0.0.1',
 )
 
+SWORDFISH_ENABLED=True
 SWORDFISH_SERVER="127.0.0.1:2929"
 SWORDFISH_DATABASE="twitter_clone"
 import sys

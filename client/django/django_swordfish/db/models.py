@@ -89,10 +89,10 @@ class SwordfishQuerySet(object):
         self.result_cache = None
 
         try:
-            settings.SWORDFISH_SERVER
-        except AttributeError:
+            assert settings.SWORDFISH_ENABLED
+        except (AttributeError, AssertionError):
             raise ImproperlyConfigured(
-                'You must set SWORDFISH_SERVER in settings.py'
+                'You must set SWORDFISH_ENABLED to True in settings.py'
             )
 
     def __repr__(self):
