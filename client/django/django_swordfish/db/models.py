@@ -88,6 +88,13 @@ class SwordfishQuerySet(object):
         self.count_cache = None
         self.result_cache = None
 
+        try:
+            settings.SWORDFISH_SERVER
+        except AttributeError:
+            raise ImproperlyConfigured(
+                'You must set SWORDFISH_SERVER in settings.py'
+            )
+
     def __repr__(self):
         data = list(self[:REPR_OUTPUT_SIZE + 1])
         if len(data) > REPR_OUTPUT_SIZE:
