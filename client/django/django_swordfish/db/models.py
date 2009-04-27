@@ -253,7 +253,7 @@ class Tree(SwordfishQuerySet):
         )
         self.invalidate_cache()
 
-    def map(self, template, key, value):
+    def map(self, template, key, value=None):
         """
         >>> my_tree.keys().map(template, key, value)
 
@@ -264,6 +264,9 @@ class Tree(SwordfishQuerySet):
         """
         assert self._values is not None, \
             "map() must be called after one of keys() or values()"
+
+        if value is None:
+            value = ''
 
         make_call(
             '/trees/%s/map/%s/%s?values=%s' % (
