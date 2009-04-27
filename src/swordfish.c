@@ -563,17 +563,17 @@ handler_tree_set_item(struct evhttp_request *request, const char *tree_key, cons
 		tctreeput(tree, value_key, strlen(value_key),
 			EVBUFFER_DATA(request->input_buffer), size);
 	} else {
-		/* If current size of tree is 1, delete entire tree instead of
-		 * leaving tree with size 0. */
-		if (tctreernum(tree) == 1) {
+		tctreeout2(tree, value_key);
+
+		/* If current size of tree is now zero, delete entire tree instead
+		 * of leaving tree with size 0. */
+		if (tctreernum(tree) == 0) {
 			tchdbout2(db, tree_key);
 
 			evbuffer_add_printf(databuf, "true");
 			REPLY_OK(request, databuf);
 			goto end;
 		}
-
-		tctreeout2(tree, value_key);
 	}
 
 	rawtree = tctreedump(tree, &size);
