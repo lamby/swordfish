@@ -55,7 +55,10 @@ class Message(models.Model):
         ordering = ('-date',)
 
     def save(self, *args, **kwargs):
-        self.username = self.user.username
+        created = not self.id
+
+        if created:
+            self.username = self.user.username
 
         super(Message, self).save(*args, **kwargs)
 
