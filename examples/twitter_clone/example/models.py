@@ -62,17 +62,18 @@ class Message(models.Model):
 
         super(Message, self).save(*args, **kwargs)
 
-        key = '%0.10d-%d' % (
-            2**31 - time.mktime(self.date.timetuple()),
-            self.pk,
-        )
+        if created:
+            key = '%0.10d-%d' % (
+                2**31 - time.mktime(self.date.timetuple()),
+                self.pk,
+            )
 
-        # Add the message to the user's message tree.
-        Tree('messages-for-%s' % self.user).set(key, self.pk)
+            # Add the message to the user's message tree.
+            Tree('messages-for-%s' % self.user).set(key, self.pk)
 
-        # Use the follower-of- tree for this user to add the message their
-        # followers' trees.
-        #
-        # This step could be done asynchronously if required - the above call
-        # could still be made sychronously to maintain the illusion.
-        Tree('follower-of-%s' % self.user).keys().map('messages-for-%', key, self.pk)
+            # Use the follower-of- tree for this user to add the message their
+            # followers' trees.
+            #
+            # This step could be done asynchronously if required - the above call
+            # could still be made sychronously to maintain the illusion.
+            Tree('follower-of-%s' % self.user).keys().map('messages-for-%', key, self.pk)
