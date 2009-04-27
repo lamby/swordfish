@@ -80,3 +80,17 @@ class Message(models.Model):
             # This step could be done asynchronously if required - the above call
             # could still be made sychronously to maintain the illusion.
             Tree('follower-of-%s' % self.user).keys().map('messages-for-%', key, self.pk)
+
+    def delete(self, *args, **kwargs):
+        key = self.key()
+
+        # Remove the message to the user's message tree.
+        Tree('messages-for-%s' % self.user).delete(key)
+
+        # Use the follower-of- tree for this user to remove the message their
+        # followers' trees.
+        #
+        # Like the call in save(), this step could be done asynchronously.
+        Tree('follower-of-%s' % self.user).keys().map('messages-for-%', key)
+
+        super(Message, self).delete(*args, **kwargs)
