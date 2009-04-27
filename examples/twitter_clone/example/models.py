@@ -54,6 +54,12 @@ class Message(models.Model):
     class Meta:
         ordering = ('-date',)
 
+    def key(self):
+        return '%0.10d-%d' % (
+            2**31 - time.mktime(self.date.timetuple()),
+            self.pk,
+        )
+
     def save(self, *args, **kwargs):
         created = not self.id
 
@@ -63,10 +69,7 @@ class Message(models.Model):
         super(Message, self).save(*args, **kwargs)
 
         if created:
-            key = '%0.10d-%d' % (
-                2**31 - time.mktime(self.date.timetuple()),
-                self.pk,
-            )
+            key = self.key()
 
             # Add the message to the user's message tree.
             Tree('messages-for-%s' % self.user).set(key, self.pk)
