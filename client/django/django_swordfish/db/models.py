@@ -182,6 +182,7 @@ class SwordfishQuerySet(object):
 
         sfqs = deepcopy(self)
         sfqs._values = 'keys'
+        sfqs.result_cache = None
         return sfqs
 
     def values(self):
@@ -190,6 +191,7 @@ class SwordfishQuerySet(object):
 
         sfqs = deepcopy(self)
         sfqs._values = 'values'
+        sfqs.result_cache = None
         return sfqs
 
     def as_model(self, model, strict=True):
@@ -214,7 +216,6 @@ class SwordfishQuerySet(object):
             else:
                 self.low_mark = self.low_mark + low
 
-    def invalidate_cache(self):
         self.count_cache = None
         self.result_cache = None
 
@@ -239,7 +240,9 @@ class Tree(SwordfishQuerySet):
             'POST',
             str(value),
         )
-        self.invalidate_cache()
+
+        self.count_cache = None
+        self.result_cache = None
 
     def delete(self, key=None):
         # Just delete specified key
@@ -251,7 +254,9 @@ class Tree(SwordfishQuerySet):
             'POST',
             '',
         )
-        self.invalidate_cache()
+
+        self.count_cache = None
+        self.result_cache = None
 
     def map(self, template, key, value=None):
         """
