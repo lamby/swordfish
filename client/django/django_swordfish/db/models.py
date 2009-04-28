@@ -65,16 +65,31 @@ def make_call(path, method='GET', data=None):
     if data is not None:
         headers['Content-Length'] = len(data)
 
-    conn.request(method, path, data, headers)
-    response = conn.getresponse()
-    assert response.status == 200, "Server status %d != 200" % response.status
-
-    val = response.read()
+    status = None
 
     try:
-        return simplejson.loads(val)
-    except ValueError:
-        raise SwordfishError('Error decoding JSON')
+        conn.request(method, path, data, headers)
+        response = conn.getresponse()
+
+        status = response.status
+
+        assert status == 200, "Server status %d != 200" % status
+
+        val = response.read()
+
+        try:
+            return simplejson.loads(val)
+        except ValueError:
+            raise SwordfishError('Error decoding JSON')
+    finally:
+        if settings.DEBUG:
+            from django_swordfish import queries
+            queries.append({
+                'method': method,
+                'path': path,
+                'data': data,
+                'status': status,
+            })
 
 class SwordfishQuerySet(object):
     def __init__(self):
