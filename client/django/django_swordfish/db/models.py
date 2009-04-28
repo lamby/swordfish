@@ -194,7 +194,7 @@ class SwordfishQuerySet(object):
         sfqs.result_cache = None
         return sfqs
 
-    def as_model(self, model, strict=True):
+    def as_model(self, model, strict=False):
         assert self.model is None, "Cannot call .as_model(..) more than once"
         assert self._values is not None, \
             "One of .keys() or .values() must be called before .as_model(..)"
