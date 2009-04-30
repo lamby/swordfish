@@ -102,6 +102,7 @@ class SwordfishQuerySet(object):
 
         self.count_cache = None
         self.result_cache = None
+        self.model_cache = None
 
         try:
             assert settings.SWORDFISH_ENABLED
@@ -140,18 +141,21 @@ class SwordfishQuerySet(object):
         if self.model is None:
             return iter(items)
 
-        data = self.model.objects.all().in_bulk(items)
+        if self.model_cache is None:
+            data = self.model.objects.all().in_bulk(items)
 
-        if self.strict:
-            return iter(data[int(x)] for x in items)
+            if self.strict:
+                self.model_cache = [data[int(x)] for x in items]
+            else:
+                def non_strict():
+                    for x in items:
+                        try:
+                            yield data[int(x)]
+                        except (KeyError, ValueError):
+                            pass
+                self.model_cache = list(non_strict())
 
-        def non_strict():
-            for x in items:
-                try:
-                    yield data[int(x)]
-                except (KeyError, ValueError):
-                    pass
-        return non_strict()
+        return iter(self.model_cache)
 
     def __getitem__(self, k):
         if not isinstance(k, (slice, int, long)):
@@ -198,6 +202,7 @@ class SwordfishQuerySet(object):
         sfqs = deepcopy(self)
         sfqs._values = 'keys'
         sfqs.result_cache = None
+        sfqs.model_cache = None
         return sfqs
 
     def values(self):
@@ -207,6 +212,7 @@ class SwordfishQuerySet(object):
         sfqs = deepcopy(self)
         sfqs._values = 'values'
         sfqs.result_cache = None
+        sfqs.model_cache = None
         return sfqs
 
     def as_model(self, model, strict=False):
@@ -217,6 +223,7 @@ class SwordfishQuerySet(object):
         sfqs = deepcopy(self)
         sfqs.model = model
         sfqs.strict = strict
+        sfqs.model_cache = None
         return sfqs
 
     def set_limits(self, low, high):
@@ -233,6 +240,7 @@ class SwordfishQuerySet(object):
 
         self.count_cache = None
         self.result_cache = None
+        self.model_cache = None
 
 class Tree(SwordfishQuerySet):
     def __init__(self, tree):
@@ -258,6 +266,7 @@ class Tree(SwordfishQuerySet):
 
         self.count_cache = None
         self.result_cache = None
+        self.model_cache = None
 
     def delete(self, key=None):
         # Just delete specified key
@@ -272,6 +281,7 @@ class Tree(SwordfishQuerySet):
 
         self.count_cache = None
         self.result_cache = None
+        self.model_cache = None
 
     def map(self, template, key, value=None):
         """
