@@ -1,4 +1,4 @@
-AC_INIT([swordfish], [0.8pre])
+AC_INIT([swordfish], [0.8])
 AC_CONFIG_HEADER(include/config.h:include/config.h.in)
 AM_INIT_AUTOMAKE([1.8])
 
