@@ -2,9 +2,9 @@
 
 . _testcase
 
-GET /database/${DB}/trees/one
+GET /databases/${DB}/trees/one
 Assert '{"items": []}'
 
 # Map
 
-POST /database/${DB}/trees/one/map/tree-%/key value
+POST /databases/${DB}/trees/one/map/tree-%/key value

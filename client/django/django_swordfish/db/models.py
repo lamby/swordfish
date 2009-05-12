@@ -52,7 +52,7 @@ def make_call(path, method='GET', data=None):
         )
 
     try:
-        path = "/database/%s%s" % (settings.SWORDFISH_DATABASE, path)
+        path = "/databases/%s%s" % (settings.SWORDFISH_DATABASE, path)
     except AttributeError:
         raise ImproperlyConfigured(
             'You must set SWORDFISH_DATABASE in settings.py'

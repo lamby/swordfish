@@ -2,35 +2,35 @@
 
 . _testcase
 
-POST /database/${DB}/trees/one/item/aaa a-value
-POST /database/${DB}/trees/one/item/bbb b-value
-POST /database/${DB}/trees/one/item/ccc c-value
+POST /databases/${DB}/trees/one/item/aaa a-value
+POST /databases/${DB}/trees/one/item/bbb b-value
+POST /databases/${DB}/trees/one/item/ccc c-value
 
-POST /database/${DB}/trees/two/item/bbb b-value
-POST /database/${DB}/trees/two/item/ccc c-value
-POST /database/${DB}/trees/two/item/ddd d-value
+POST /databases/${DB}/trees/two/item/bbb b-value
+POST /databases/${DB}/trees/two/item/ccc c-value
+POST /databases/${DB}/trees/two/item/ddd d-value
 
-GET /database/${DB}/trees/one
+GET /databases/${DB}/trees/one
 Assert '{"items": [["aaa","a-value"],["bbb","b-value"],["ccc","c-value"]]}'
 
-GET /database/${DB}/trees/two
+GET /databases/${DB}/trees/two
 Assert '{"items": [["bbb","b-value"],["ccc","c-value"],["ddd","d-value"]]}'
 
 # Difference
 
-GET /database/${DB}/trees/one/difference/two
+GET /databases/${DB}/trees/one/difference/two
 Assert '{"items": [["aaa","a-value"]]}'
 
-GET /database/${DB}/trees/one/difference/two\?values=all
+GET /databases/${DB}/trees/one/difference/two\?values=all
 Assert '{"items": [["aaa","a-value"]]}'
 
-GET /database/${DB}/trees/one/difference/two\?values=keys
+GET /databases/${DB}/trees/one/difference/two\?values=keys
 Assert '{"items": ["aaa"]}'
 
-GET /database/${DB}/trees/one/difference/two\?values=values
+GET /databases/${DB}/trees/one/difference/two\?values=values
 Assert '{"items": ["a-value"]}'
 
 # Counts
 
-GET /database/${DB}/trees/one/difference/two/count
+GET /databases/${DB}/trees/one/difference/two/count
 Assert '{"count": 1}'

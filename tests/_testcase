@@ -69,7 +69,7 @@ GET () {
 }
 
 # Flush testing database
-if ! POST /database/${DB}/delete
+if ! POST /databases/${DB}/delete
 then
 	echo "Could not flush database; is Swordfish running?"
 

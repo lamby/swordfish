@@ -2,27 +2,27 @@
 
 . _testcase
 
-GET /database/${DB}/trees/one
+GET /databases/${DB}/trees/one
 Assert '{"items": []}'
 
-GET /database/${DB}/trees/two
+GET /databases/${DB}/trees/two
 Assert '{"items": []}'
 
 # Difference
 
-GET /database/${DB}/trees/one/difference/two
+GET /databases/${DB}/trees/one/difference/two
 Assert '{"items": []}'
 
-GET /database/${DB}/trees/one/difference/two\?values=all
+GET /databases/${DB}/trees/one/difference/two\?values=all
 Assert '{"items": []}'
 
-GET /database/${DB}/trees/one/difference/two\?values=keys
+GET /databases/${DB}/trees/one/difference/two\?values=keys
 Assert '{"items": []}'
 
-GET /database/${DB}/trees/one/difference/two\?values=values
+GET /databases/${DB}/trees/one/difference/two\?values=values
 Assert '{"items": []}'
 
 # Counts
 
-GET /database/${DB}/trees/one/difference/two/count
+GET /databases/${DB}/trees/one/difference/two/count
 Assert '{"count": 0}'

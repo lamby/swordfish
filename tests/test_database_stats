@@ -2,6 +2,6 @@
 
 . _testcase
 
-GET /database/${DB}/stats
+GET /databases/${DB}/stats
 
 test "${RET}" != ""

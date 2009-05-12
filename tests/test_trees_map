@@ -2,31 +2,31 @@
 
 . _testcase
 
-POST /database/${DB}/trees/one/item/aaa a-value
-POST /database/${DB}/trees/one/item/bbb b-value
-POST /database/${DB}/trees/one/item/ccc c-value
+POST /databases/${DB}/trees/one/item/aaa a-value
+POST /databases/${DB}/trees/one/item/bbb b-value
+POST /databases/${DB}/trees/one/item/ccc c-value
 
-GET /database/${DB}/trees/one
+GET /databases/${DB}/trees/one
 Assert '{"items": [["aaa","a-value"],["bbb","b-value"],["ccc","c-value"]]}'
 
-GET /database/${DB}/trees/tree-aaa
+GET /databases/${DB}/trees/tree-aaa
 Assert '{"items": []}'
 
-GET /database/${DB}/trees/tree-bbb
+GET /databases/${DB}/trees/tree-bbb
 Assert '{"items": []}'
 
-GET /database/${DB}/trees/tree-ccc
+GET /databases/${DB}/trees/tree-ccc
 Assert '{"items": []}'
 
 # Map
 
-POST /database/${DB}/trees/one/map/tree-%/key value
+POST /databases/${DB}/trees/one/map/tree-%/key value
 
-GET /database/${DB}/trees/tree-aaa
+GET /databases/${DB}/trees/tree-aaa
 Assert '{"items": [["key","value"]]}'
 
-GET /database/${DB}/trees/tree-bbb
+GET /databases/${DB}/trees/tree-bbb
 Assert '{"items": [["key","value"]]}'
 
-GET /database/${DB}/trees/tree-ccc
+GET /databases/${DB}/trees/tree-ccc
 Assert '{"items": [["key","value"]]}'
