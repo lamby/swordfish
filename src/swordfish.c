@@ -1429,7 +1429,7 @@ main(int argc, char** argv)
 	config.pidfile = NULL;
 	config.logfile = NULL;
 
-	while ((ch = getopt(argc, argv, "p:P:d:l:")) != -1)
+	while ((ch = getopt(argc, argv, "p:P:i:d:l:")) != -1)
 		switch(ch) {
 		case 'p':
 			config.pidfile = optarg;
@@ -1441,7 +1441,7 @@ main(int argc, char** argv)
 				return EXIT_FAILURE;
 			}
 			break;
-		case 'h':
+		case 'i':
 			config.host = optarg;
 			break;
 		case 'd':
