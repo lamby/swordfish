@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. _testcase
+. ./_testcase
 
 GET /databases/${DB}/stats
 

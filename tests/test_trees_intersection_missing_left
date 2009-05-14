@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. _testcase
+. ./_testcase
 
 POST /databases/${DB}/trees/two/item/bbb b-value
 POST /databases/${DB}/trees/two/item/ccc c-value

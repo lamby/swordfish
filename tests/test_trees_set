@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. _testcase
+. ./_testcase
 
 POST /databases/${DB}/trees/treename/item/zzz z-value
 GET /databases/${DB}/trees/treename/item/zzz
