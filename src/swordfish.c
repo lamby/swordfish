@@ -713,7 +713,7 @@ handler_tree_get_item(struct evhttp_request *request, const char *tree_key, cons
 		}
 
 		evbuffer_add_printf(databuf, "false");
-		REPLY_NOTFOUND(request, databuf);
+		REPLY_NOTFOUND(request, databuf, "Tree not found");
 		goto end;
 	}
 
@@ -724,7 +724,7 @@ handler_tree_get_item(struct evhttp_request *request, const char *tree_key, cons
 
 	if (!value) {
 		evbuffer_add_printf(databuf, "false");
-		REPLY_NOTFOUND(request, databuf);
+		REPLY_NOTFOUND(request, databuf, "Item not found");
 		goto end;
 	}
 
@@ -1116,6 +1116,7 @@ request_handler(struct evhttp_request *request, void *arg)
 	char *arg_1 = NULL;
 	char *arg_2 = NULL;
 	char *arg_3 = NULL;
+        char *notfound_message = "Not found";
 
 	struct evkeyvalq querystr;
 	struct evbuffer *databuf = evbuffer_new();
@@ -1143,6 +1144,7 @@ request_handler(struct evhttp_request *request, void *arg)
 		database = strtok_r(NULL, "/", &saveptr);
 		if (!database) {
 			/* no database specified */
+			notfound_message = "No database specified";
 			goto notfound;
 		}
 
@@ -1190,6 +1192,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			arg_1 = strtok_r(NULL, "/", &saveptr);
 			if (!arg_1) {
 				/* no count specified */
+				notfound_message = "No count specified";
 				goto notfound;
 			}
 
@@ -1208,6 +1211,7 @@ request_handler(struct evhttp_request *request, void *arg)
 			arg_1 = strtok_r(NULL, "/", &saveptr);
 			if (!arg_1) {
 				/* no tree specified */
+				notfound_message = "No tree specified";
 				goto notfound;
 			}
 
@@ -1223,8 +1227,10 @@ request_handler(struct evhttp_request *request, void *arg)
 				break;
 
 			case RESOURCE_ITEM:
-				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL) {
+					notfound_message = "No item specified";
 					goto notfound;
+                                }
 
 				switch (request->type) {
 				case EVHTTP_REQ_POST:
@@ -1248,8 +1254,10 @@ request_handler(struct evhttp_request *request, void *arg)
 
 			case RESOURCE_INTERSECTION:
 				/* return intersection of `tree` and `arg_2` */
-				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL) {
+					notfound_message = "No second tree specified";
 					goto notfound;
+                                }
 
 				arg_2 = get_typed_key(TYPE_TREE, arg_2);
 
@@ -1269,6 +1277,7 @@ request_handler(struct evhttp_request *request, void *arg)
 				default:
 					/* unknown subcommand */
 					free(arg_2);
+					notfound_message = "Unknown subcommand";
 					goto notfound;
 				}
 				free(arg_2);
@@ -1276,8 +1285,10 @@ request_handler(struct evhttp_request *request, void *arg)
 
 			case RESOURCE_DIFFERENCE:
 				/* return difference between `tree` and `arg_2` */
-				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL)
+				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL) {
+					notfound_message = "No second tree specified";
 					goto notfound;
+                                }
 
 				arg_2 = get_typed_key(TYPE_TREE, arg_2);
 
@@ -1297,6 +1308,7 @@ request_handler(struct evhttp_request *request, void *arg)
 				default:
 					/* unknown subcommand */
 					free(arg_2);
+					notfound_message = "Unknown subcommand";
 					goto notfound;
 				}
 				free(arg_2);
@@ -1316,6 +1328,7 @@ request_handler(struct evhttp_request *request, void *arg)
 
 			default:
 				/* unknown subcommand */
+				notfound_message = "Unknown tree subcommand";
 				goto notfound;
 			}
 
@@ -1323,6 +1336,7 @@ request_handler(struct evhttp_request *request, void *arg)
 
 		default:
 			/* unknown sub-database entity */
+			notfound_message = "Unknown entity";
 			goto notfound;
 		}
 
@@ -1330,13 +1344,14 @@ request_handler(struct evhttp_request *request, void *arg)
 
 	default:
 		/* unknown command */
+		notfound_message = "Unknown command";
 		goto notfound;
 	}
 
 	goto end;
 
 notfound:
-	REPLY_NOTFOUND(request, databuf);
+	REPLY_NOTFOUND(request, databuf, notfound_message);
 
 end:
 	free(uri);
@@ -1502,7 +1517,7 @@ main(int argc, char** argv)
 			break;
 		default:
 			return EXIT_SUCCESS;
-		}	
+		}
 
 		if (setsid() == -1) {
 			perror("setsid");

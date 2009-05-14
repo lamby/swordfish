@@ -49,7 +49,7 @@ struct config {
 
 #define REPLY_OK(req, buf) send_reply(req, buf, HTTP_OK, "OK")
 #define REPLY_BADREQUEST(req, buf) send_reply(req, buf, HTTP_BADREQUEST, "Bad Request")
-#define REPLY_NOTFOUND(req, buf) send_reply(req, buf, HTTP_NOTFOUND, "Not Found")
+#define REPLY_NOTFOUND(req, buf, message) send_reply(req, buf, HTTP_NOTFOUND, message)
 #define REPLY_BADMETHOD(req, buf) send_reply(req, buf, 405, "Method Not Allowed")
 #define REPLY_INTERR(req, buf) send_reply(req, buf, 500, "Internal Server Error")
 
