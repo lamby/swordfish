@@ -1170,8 +1170,6 @@ request_handler(struct evhttp_request *request, void *arg)
 				goto end;
 			}
 
-			tchdboptimize(db, 0, -1, -1, HDBTLARGE);
-
 			if (db_name != NULL)
 				free(db_name);
 
