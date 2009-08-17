@@ -1228,7 +1228,7 @@ request_handler(struct evhttp_request *request, void *arg)
 				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL) {
 					notfound_message = "No item specified";
 					goto notfound;
-                                }
+				}
 
 				switch (request->type) {
 				case EVHTTP_REQ_POST:
@@ -1255,7 +1255,7 @@ request_handler(struct evhttp_request *request, void *arg)
 				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL) {
 					notfound_message = "No second tree specified";
 					goto notfound;
-                                }
+				}
 
 				arg_2 = get_typed_key(TYPE_TREE, arg_2);
 
@@ -1286,7 +1286,7 @@ request_handler(struct evhttp_request *request, void *arg)
 				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL) {
 					notfound_message = "No second tree specified";
 					goto notfound;
-                                }
+				}
 
 				arg_2 = get_typed_key(TYPE_TREE, arg_2);
 
