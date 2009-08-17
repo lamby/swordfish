@@ -1116,7 +1116,7 @@ request_handler(struct evhttp_request *request, void *arg)
 	char *arg_1 = NULL;
 	char *arg_2 = NULL;
 	char *arg_3 = NULL;
-        char *notfound_message = "Not found";
+	const char *notfound_message = "Not found";
 
 	struct evkeyvalq querystr;
 	struct evbuffer *databuf = evbuffer_new();
