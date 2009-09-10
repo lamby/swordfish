@@ -137,6 +137,8 @@ fi
 AC_PROG_MAKE_SET
 AC_PROG_CC
 
+CFLAGS="$CFLAGS -Werror" 
+
 AC_MSG_NOTICE([Using CFLAGS="$CFLAGS"])
 AC_MSG_NOTICE([Using LIBS="$LIBS"])
 AC_OUTPUT(Makefile src/Makefile man/Makefile)
