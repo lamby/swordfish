@@ -1367,8 +1367,7 @@ usage(const char *progname)
 		"\t -d datadir     data directory\n"
 		"\t -i interface   interface to run server on\n"
 		"\t -P port        port number to run server on\n"
-		"\t -p pidfile     daemonise and write pid to <pidfile>\n"
-		"\t -v             enable verbose mode\n",
+		"\t -p pidfile     daemonise and write pid to <pidfile>\n",
 		progname);
 }
 
