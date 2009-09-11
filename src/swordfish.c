@@ -837,7 +837,7 @@ handler_database_delete(struct evhttp_request *request)
 
 	switch (request->type) {
 	case EVHTTP_REQ_POST:
-		swordfish_info("Flushing database %s\n", db_name);
+		swordfish_info("Deleting database %s\n", db_name);
 		tchdbvanish(db);
 		evbuffer_add_printf(databuf, "true");
 		REPLY_OK(request, databuf);
