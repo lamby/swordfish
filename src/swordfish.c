@@ -329,7 +329,7 @@ handler_tree_union(struct evhttp_request *request, const char *left_key, const c
 	char* value = NULL;
 	const char* left_val = NULL;
 	const char* right_val = NULL;
-    const char* chosen_val = NULL;
+	const char* chosen_val = NULL;
 
 	TCTREE *left = NULL;
 	TCTREE *right = NULL;
@@ -363,12 +363,11 @@ handler_tree_union(struct evhttp_request *request, const char *left_key, const c
 		right_val = tctreeiternext2(right);
 	}
 
+	if (left_val == NULL && right_val == NULL) {
+		goto end;
+	}
 
-    if (left_val == NULL && right_val == NULL) {
-        goto end;
-    }
-
-    // emit once for both trees as long as they are equal
+	// Emit once for both trees as long as they are equal
 	while (left_val || right_val)
 		{
 			if (result_count == limit)
