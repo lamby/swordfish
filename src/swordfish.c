@@ -369,76 +369,75 @@ handler_tree_union(struct evhttp_request *request, const char *left_key, const c
 
 	// Emit once for both trees as long as they are equal
 	while (left_val || right_val)
-		{
-			if (result_count == limit)
-				break;
+	{
+		if (result_count == limit)
+			break;
 
-			if (left_val && right_val) {
-				cmp_val = SWORDFISH_KEY_CMP(left_val, strlen(left_val),
-											right_val, strlen(right_val), NULL);
-			} else {
-				cmp_val = left_val ? -1 : 1;
-			}
-			switch ((cmp_val > 0) - (cmp_val < 0))
-				{
-				case 0:
-				case -1:
-					chosen = left;
-					chosen_val = left_val;
-					break;
-				case 1:
-					chosen = right;
-					chosen_val = right_val;
-					break;
-				}
-
-			/* left < right */
-			if (skip == 0) {
-				switch (result) {
-				case RESULT_KEYS:
-					if (result_count)
-						evbuffer_add_printf(databuf, ",");
-					append_json_value(databuf, chosen_val);
-					break;
-				case RESULT_VALUES:
-					if (result_count)
-						evbuffer_add_printf(databuf, ",");
-					append_json_value(databuf, tctreeget2(chosen, chosen_val));
-					break;
-				case RESULT_ALL:
-					evbuffer_add_printf(databuf,
-										(result_count == 0) ? "[" : ",[");
-					append_json_value(databuf, chosen_val);
-					evbuffer_add_printf(databuf, ",");
-					append_json_value(databuf, tctreeget2(chosen, chosen_val));
-					evbuffer_add_printf(databuf, "]");
-				}
-
-				++result_count;
-			} else {
-				/* Skip this element */
-				skip--;
-			}
-
-			switch ((cmp_val > 0) - (cmp_val < 0))
-				{
-				case 0:
-					/* left == right; Element intersects */
-					left_val = tctreeiternext2(left);
-					right_val = tctreeiternext2(right);
-					break;
-
-				case -1:
-					left_val = tctreeiternext2(left);
-					break;
-
-				case 1:
-					/* left > right */
-					right_val = tctreeiternext2(right);
-					break;
-				}
+		if (left_val && right_val) {
+			cmp_val = SWORDFISH_KEY_CMP(left_val, strlen(left_val),
+				right_val, strlen(right_val), NULL);
+		} else {
+			cmp_val = left_val ? -1 : 1;
 		}
- end:
+
+		switch ((cmp_val > 0) - (cmp_val < 0)) {
+		case 0:
+		case -1:
+			chosen = left;
+			chosen_val = left_val;
+			break;
+		case 1:
+			chosen = right;
+			chosen_val = right_val;
+			break;
+		}
+
+		/* left < right */
+		if (skip == 0) {
+			switch (result) {
+			case RESULT_KEYS:
+				if (result_count)
+					evbuffer_add_printf(databuf, ",");
+				append_json_value(databuf, chosen_val);
+				break;
+			case RESULT_VALUES:
+				if (result_count)
+					evbuffer_add_printf(databuf, ",");
+				append_json_value(databuf, tctreeget2(chosen, chosen_val));
+				break;
+			case RESULT_ALL:
+				evbuffer_add_printf(databuf,
+					(result_count == 0) ? "[" : ",[");
+				append_json_value(databuf, chosen_val);
+				evbuffer_add_printf(databuf, ",");
+				append_json_value(databuf, tctreeget2(chosen, chosen_val));
+				evbuffer_add_printf(databuf, "]");
+			}
+
+			++result_count;
+		} else {
+			/* Skip this element */
+			skip--;
+		}
+
+		switch ((cmp_val > 0) - (cmp_val < 0)) {
+		case 0:
+			/* left == right; Element intersects */
+			left_val = tctreeiternext2(left);
+			right_val = tctreeiternext2(right);
+			break;
+
+		case -1:
+			left_val = tctreeiternext2(left);
+			break;
+
+		case 1:
+			/* left > right */
+			right_val = tctreeiternext2(right);
+			break;
+		}
+	}
+end:
 	if (result == RESULT_COUNT) {
 		evbuffer_add_printf(databuf, "%d}", result_count);
 	} else {
@@ -453,7 +452,6 @@ handler_tree_union(struct evhttp_request *request, const char *left_key, const c
 	evbuffer_free(databuf);
 	++stats.total_cmds;
 }
-
 
 void
 handler_tree_difference(struct evhttp_request *request, const char *left_key, const char *right_key, int result, int skip, int limit)
