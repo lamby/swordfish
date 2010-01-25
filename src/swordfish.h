@@ -81,7 +81,8 @@ const char *resource_lookup_table[] = {
 	"sync",
 	"keys",
 	"values",
-	"delete"
+	"delete",
+	"union"
 };
 
 enum {
@@ -98,6 +99,7 @@ enum {
 	RESOURCE_KEYS,
 	RESOURCE_VALUES,
 	RESOURCE_DELETE,
+	RESOURCE_UNION,
 
 	RESOURCE_NONE,
 	RESOURCE_UNKNOWN,

@@ -320,6 +320,144 @@ end:
 }
 
 void
+handler_tree_union(struct evhttp_request *request, const char *left_key, const char *right_key, int result, int skip, int limit)
+{
+	int size;
+	int cmp_val;
+	int result_count = 0;
+
+	char* value = NULL;
+	const char* left_val = NULL;
+	const char* right_val = NULL;
+    const char* chosen_val = NULL;
+
+	TCTREE *left = NULL;
+	TCTREE *right = NULL;
+	TCTREE *chosen = NULL;
+
+	struct evbuffer *databuf = evbuffer_new();
+
+	if (limit == 0) {
+		limit = -1;
+	}
+
+	if (result == RESULT_COUNT) {
+		evbuffer_add_printf(databuf, "{\"count\": ");
+	} else {
+		evbuffer_add_printf(databuf, "{\"items\": [");
+	}
+
+	value = tchdbget(db, left_key, strlen(left_key), &size);
+	if (value) {
+		left = tctreeload(value, size, SWORDFISH_KEY_CMP, NULL);
+		free(value);
+	}
+
+	value = tchdbget(db, right_key, strlen(right_key), &size);
+	if (value) {
+		right = tctreeload(value, size, SWORDFISH_KEY_CMP, NULL);
+		free(value);
+	}
+
+	tctreeiterinit(left);
+	tctreeiterinit(right);
+
+	left_val = tctreeiternext2(left);
+	right_val = tctreeiternext2(right);
+
+    if (left == NULL && right == NULL) {
+        goto end;
+    }
+
+    // emit once for both trees as long as they are equal
+	while (left_val || right_val)
+		{
+			if (result_count == limit)
+				break;
+
+			if (left_val && right_val) {
+				cmp_val = SWORDFISH_KEY_CMP(left_val, strlen(left_val),
+											right_val, strlen(right_val), NULL);
+			} else {
+				cmp_val = left_val ? -1 : 1;
+			}
+			switch ((cmp_val > 0) - (cmp_val < 0))
+				{
+				case 0:
+				case -1:
+					chosen = left;
+					chosen_val = left_val;
+					break;
+				case 1:
+					chosen = right;
+					chosen_val = right_val;
+					break;
+				}
+
+			/* left < right */
+			if (skip == 0) {
+				switch (result) {
+				case RESULT_KEYS:
+					if (result_count)
+						evbuffer_add_printf(databuf, ",");
+					append_json_value(databuf, chosen_val);
+					break;
+				case RESULT_VALUES:
+					if (result_count)
+						evbuffer_add_printf(databuf, ",");
+					append_json_value(databuf, tctreeget2(chosen, chosen_val));
+					break;
+				case RESULT_ALL:
+					evbuffer_add_printf(databuf,
+										(result_count == 0) ? "[" : ",[");
+					append_json_value(databuf, chosen_val);
+					evbuffer_add_printf(databuf, ",");
+					append_json_value(databuf, tctreeget2(chosen, chosen_val));
+					evbuffer_add_printf(databuf, "]");
+				}
+
+				++result_count;
+			} else {
+				/* Skip this element */
+				skip--;
+			}
+
+			switch ((cmp_val > 0) - (cmp_val < 0))
+				{
+				case 0:
+					/* left == right; Element intersects */
+					left_val = tctreeiternext2(left);
+					right_val = tctreeiternext2(right);
+					break;
+
+				case -1:
+					left_val = tctreeiternext2(left);
+					break;
+
+				case 1:
+					/* left > right */
+					right_val = tctreeiternext2(right);
+					break;
+				}
+		}
+ end:
+	if (result == RESULT_COUNT) {
+		evbuffer_add_printf(databuf, "%d}", result_count);
+	} else {
+		evbuffer_add_printf(databuf, "]}");
+	}
+
+	REPLY_OK(request, databuf);
+
+	if (left) tctreedel(left);
+	if (right) tctreedel(right);
+
+	evbuffer_free(databuf);
+	++stats.total_cmds;
+}
+
+
+void
 handler_tree_difference(struct evhttp_request *request, const char *left_key, const char *right_key, int result, int skip, int limit)
 {
 	int size;
@@ -1300,6 +1438,37 @@ request_handler(struct evhttp_request *request, void *arg)
 
 				case RESOURCE_COUNT:
 					handler_tree_difference(request, arg_1, arg_2,
+						RESULT_COUNT, 0, -1);
+					break;
+					
+				default:
+					/* unknown subcommand */
+					free(arg_2);
+					notfound_message = "Unknown subcommand";
+					goto notfound;
+				}
+				free(arg_2);
+				break;
+
+			case RESOURCE_UNION:
+				/* return union between `tree` and `arg_2` */
+				if ((arg_2 = strtok_r(NULL, "/", &saveptr)) == NULL) {
+					notfound_message = "No second tree specified";
+					goto notfound;
+				}
+
+				arg_2 = get_typed_key(TYPE_TREE, arg_2);
+
+				switch (lookup_resource(strtok_r(NULL, "/", &saveptr))) {
+				case RESOURCE_NONE:
+					handler_tree_union(request, arg_1, arg_2,
+						get_values_value(&querystr),
+						get_int_header(&querystr, "skip", 0),
+						get_int_header(&querystr, "limit", 0));
+					break;
+
+				case RESOURCE_COUNT:
+					handler_tree_union(request, arg_1, arg_2,
 						RESULT_COUNT, 0, -1);
 					break;
 					

@@ -1,0 +1,36 @@
+#!/bin/sh
+
+. ./_testcase
+
+POST /databases/${DB}/trees/one/item/aaa a-value
+POST /databases/${DB}/trees/one/item/bbb b-value
+POST /databases/${DB}/trees/one/item/ccc c-value
+
+POST /databases/${DB}/trees/two/item/bbb b-value
+POST /databases/${DB}/trees/two/item/ccc c-value
+POST /databases/${DB}/trees/two/item/ddd d-value
+
+GET /databases/${DB}/trees/one
+Assert '{"items": [["aaa","a-value"],["bbb","b-value"],["ccc","c-value"]]}'
+
+GET /databases/${DB}/trees/two
+Assert '{"items": [["bbb","b-value"],["ccc","c-value"],["ddd","d-value"]]}'
+
+# Union
+
+GET /databases/${DB}/trees/one/union/two
+Assert '{"items": [["aaa","a-value"],["bbb","b-value"],["ccc","c-value"],["ddd","d-value"]]}'
+
+GET /databases/${DB}/trees/one/union/two\?values=all
+Assert '{"items": [["aaa","a-value"],["bbb","b-value"],["ccc","c-value"],["ddd","d-value"]]}'
+
+GET /databases/${DB}/trees/one/union/two\?values=keys
+Assert '{"items": ["aaa","bbb","ccc","ddd"]}'
+
+GET /databases/${DB}/trees/one/union/two\?values=values
+Assert '{"items": ["a-value","b-value","c-value","d-value"]}'
+
+# Counts
+
+GET /databases/${DB}/trees/one/union/two/count
+Assert '{"count": 4}'
