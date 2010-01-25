@@ -351,21 +351,20 @@ handler_tree_union(struct evhttp_request *request, const char *left_key, const c
 	if (value) {
 		left = tctreeload(value, size, SWORDFISH_KEY_CMP, NULL);
 		free(value);
+		tctreeiterinit(left);
+		left_val = tctreeiternext2(left);
 	}
 
 	value = tchdbget(db, right_key, strlen(right_key), &size);
 	if (value) {
 		right = tctreeload(value, size, SWORDFISH_KEY_CMP, NULL);
 		free(value);
+		tctreeiterinit(right);
+		right_val = tctreeiternext2(right);
 	}
 
-	tctreeiterinit(left);
-	tctreeiterinit(right);
 
-	left_val = tctreeiternext2(left);
-	right_val = tctreeiternext2(right);
-
-    if (left == NULL && right == NULL) {
+    if (left_val == NULL && right_val == NULL) {
         goto end;
     }
 

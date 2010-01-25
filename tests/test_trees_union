@@ -34,3 +34,21 @@ Assert '{"items": ["a-value","b-value","c-value","d-value"]}'
 
 GET /databases/${DB}/trees/one/union/two/count
 Assert '{"count": 4}'
+
+
+# empty tree one or two
+
+POST /databases/${DB}/trees/a/item/aaa a-value
+POST /databases/${DB}/trees/a/item/bbb b-value
+
+POST /databases/${DB}/trees/b/item/aaa a-value
+POST /databases/${DB}/trees/b/item/aaa ""
+
+GET /databases/${DB}/trees/a/union/b/count
+Assert '{"count": 2}'
+
+GET /databases/${DB}/trees/a/union/b
+Assert '{"items": [["aaa","a-value"],["bbb","b-value"]]}'
+
+GET /databases/${DB}/trees/b/union/a
+Assert '{"items": [["aaa","a-value"],["bbb","b-value"]]}'
