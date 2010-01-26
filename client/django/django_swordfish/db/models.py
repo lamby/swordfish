@@ -41,7 +41,7 @@ from django_swordfish.utils import SwordfishError
 
 REPR_OUTPUT_SIZE = 20
 
-__all__ = ('Database', 'Tree', 'TreeIntersection')
+__all__ = ('Database', 'Tree', 'TreeIntersection', 'TreeUnion')
 
 def make_call(path, method='GET', data=None):
     try:
@@ -349,3 +349,6 @@ class TreeIntersection(TreeCommand):
 
 class TreeDifference(TreeCommand):
     COMMAND = 'difference'
+
+class TreeUnion(TreeCommand):
+    COMMAND = 'union'
