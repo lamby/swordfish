@@ -26,6 +26,8 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <stdint.h>
+#include <inttypes.h>
 
 #include <event.h>
 #include <evhttp.h>
@@ -173,7 +175,7 @@ handler_stats(struct evhttp_request *request)
 
 	evbuffer_add_printf(databuf, "{");
 	evbuffer_add_printf(databuf,   "\"started\": %lu", stats.started);
-	evbuffer_add_printf(databuf, ", \"total_cmds\": %lu", stats.total_cmds);
+	evbuffer_add_printf(databuf, ", \"total_cmds\": %" PRIu64, stats.total_cmds);
 	evbuffer_add_printf(databuf, ", \"version\": \"%s\"", PACKAGE_VERSION);
 	evbuffer_add_printf(databuf, ", \"tokyocabinet_version\": \"%s\"", tcversion);
 	evbuffer_add_printf(databuf, "}\n");
@@ -191,7 +193,7 @@ handler_stats_database(struct evhttp_request *request)
 
 	evbuffer_add_printf(databuf, "{");
 	evbuffer_add_printf(databuf, "\"database\": \"%s\"", db_realpath);
-	evbuffer_add_printf(databuf, ", \"num_items\": %zu", tchdbrnum(db));
+	evbuffer_add_printf(databuf, ", \"num_items\": %" PRIu64, tchdbrnum(db));
 	evbuffer_add_printf(databuf, ", \"database_bytes\": %jd", tchdbfsiz(db));
 	evbuffer_add_printf(databuf, "}\n");
 
